@@ -1,0 +1,74 @@
+// IO_Control.h
+
+
+#ifndef IO_CONTROL_H
+#define IO_CONTROL_H
+
+
+namespace IO_Control
+{
+
+  class FourAxisJoystick
+  {
+    private:
+
+      int RESOLUTION = 4095;
+      int pinX;
+      int pinY;
+      int pinZ;
+      int pinBtn;
+      int map_min= -2048;
+      int map_max= 2048;
+
+      bool btn_prev;
+
+      float x_prev;
+      float y_prev;
+      float z_prev;
+
+      int offset_X=0;
+      int offset_Y=0;
+      int offset_Z=0;
+
+      float multi_prev;
+      float multi_cur;
+
+      int ReadAna(int pin,int offset, float *prev);
+      void resolutionSet(int resolution);
+      int GetAvarageAnalog(int pin, int count);
+
+    public:
+      #define RESOLUTION_10_BIT 1026
+      #define RESOLUTION_12_BIT 4096
+
+      FourAxisJoystick(/* args */);
+      ~FourAxisJoystick();
+
+      void init(int resolution, int pinX, int pinY, int pinZ, int pinBtn, float softness);
+      void init(int resolution, int pinX, int pinY, int pinZ, int pinBtn, float softness, int maping_min, int maping_max);
+      
+      void AutoZero();
+
+      int readX();
+      int readY();
+      int readZ();
+      int readBtn();
+
+      int readX_Raw();
+      int readY_Raw();
+      int readZ_Raw();
+
+  };
+
+  class InOut
+  {
+  private:
+    /* data */
+  public:
+    InOut(/* args */);
+    ~InOut();
+    static int ReadInput(int pin);
+  };
+}
+
+#endif
