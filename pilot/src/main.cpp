@@ -177,9 +177,9 @@ void setup() {
   String str = "RC v";
   str += String(VERSION);
 
-  display.setTextSize(1);             
+  display.setTextSize(2);             
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(50,0);
+  display.setCursor(20,0);
   display.println(str);
   display.display();
 
