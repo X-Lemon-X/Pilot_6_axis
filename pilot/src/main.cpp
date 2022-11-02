@@ -61,45 +61,6 @@ Adafruit_SSD1306 display = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, 
 
 using namespace OledMenu;
 
-/*
-
-MenuItem item_1 = MenuItem("item1",); 
-  MenuItem set1 = MenuItem("set1", "text"); 
-  MenuItem set2 = MenuItem("set2", true); 
-MenuItem item_2 = MenuItem("item2",); 
-  MenuItem item_2_1 = MenuItem("item2_item1",); 
-    MenuItem set3 = MenuItem("set3", 15);  
-  MenuItem item_2_2 = MenuItem("item2_item2",); 
-    MenuItem set4 = MenuItem("set4", "text"); 
-     
-
-Menu menu_1 = Menu(list<MenuItem>{item_1, item_2});
-  Menu menu_1_1 = Menu(list<MenuItem>{set1, set2});
-  Menu menu_1_2 = Menu(list<MenuItem>{item_2_1, item_2_2});
-    Menu menu_1_2_1 = Menu(list<MenuItem>{set3});
-    Menu menu_1_2_2 =Menu(list<MenuItem>{set4});
-
-*/
- /*    
-    MenuItem set1 = MenuItem("set1", "text"); 
-    MenuItem set2 = MenuItem("set2", true); 
-   Menu menu_1_1 = Menu(list<MenuItem>{set1, set2});
-  MenuItem item_1 = MenuItem("item1", menu_1_1);
-
-
-      MenuItem set4 = MenuItem("set4", "text"); 
-      Menu menu_s4 = Menu(list<MenuItem>{set4});
-    MenuItem item_2_2 = MenuItem("item2_item2",menu_s4); 
-      MenuItem set3 = MenuItem("set3", 15);  
-      Menu menu_s3 = Menu(list<MenuItem>{set3});
-    MenuItem item_2_1 = MenuItem("item2_item1",menu_s3); 
-  Menu menu_1_2 = Menu(list<MenuItem>{item_2_1, item_2_2});
-  MenuItem item_2 = MenuItem("item2",menu_1_2);
-
-Menu menu_1 = Menu(list<MenuItem>{item_1, item_2});
-
-*/
-
 struct InputsData
 {
   int joystick_1_x=0;
@@ -202,8 +163,27 @@ void setup() {
 // Serialhandliing and wireless conections
 void loop() {
 
-  int i =5;
- 
+  Serial.println("Start");
+
+  char *tetx = "jakiś tam text";
+
+  DataGroup dg;
+
+  Serial.println(tetx);
+
+  dg.type = OLEDMENU_STRING;
+  strcpy(dg.veriable.charD,tetx);
+
+  MenuItem om = MenuItem(1,-1,"name",dg);
+  
+  Serial.println(tetx);
+
+  strcpy(dg.veriable.charD, "zmiana");
+
+  Serial.println(tetx); 
+  
+  delay(10000);
+
 }
 
 
@@ -213,25 +193,6 @@ void loop2(void * pvParameters)
   for(;;)
   {
       ReadingInputs();
-      //display.clearDisplay();
-      //display.setCursor(0,0);
-      Serial.print(inputs_main.joystick_1_x);
-      Serial.print(",");
-      Serial.print(inputs_main.joystick_1_y);
-      Serial.print(",");
-      Serial.print(inputs_main.joystick_1_z);
-      Serial.print(",");
-      Serial.print(inputs_main.joystick_2_x);
-      Serial.print(",");
-      Serial.print(inputs_main.joystick_2_y);
-      Serial.print(",");
-      Serial.print(inputs_main.joystick_2_z);
-      Serial.print("  ,  ");
-      Serial.print(inputs_main.joystick_1_btn);
-      Serial.print(",");
-      Serial.print(inputs_main.joystick_2_btn);
-      Serial.print("  ,  ");
-      Serial.println();
   }
 }
 
