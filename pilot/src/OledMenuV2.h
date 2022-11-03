@@ -44,7 +44,9 @@ namespace OledMenu
         DataGroup GetData();
         MenuItem(int id, int idf, string name);
         MenuItem(int id, int idf, string name, DataGroup data);
-
+        int GetId();
+        int GetIdFolder();
+        bool GetIfFolder();
     };
     
     MenuItem::MenuItem(int id, int idf, string name)
@@ -63,17 +65,65 @@ namespace OledMenu
         this->name = name;
     }
 
+    int MenuItem::GetId()
+    {
+        return id;
+    }
+
+    int MenuItem::GetIdFolder()
+    {
+        return idf;
+    }
+
+    bool MenuItem::GetIfFolder()
+    {
+        return folder;
+    }
+
     DataGroup MenuItem::GetData()
     {
         return this->data;
     }
 
 
+    class Folder
+    {
+
+    private:
+        int idf;
+        string name;
+    public:
+        MenuItem(int id, int idf, string name);
+        int GetIdFolder();
+        bool GetIfFolder();
+    };
+
+    Folder::Folder(int id, int idf, string name)
+    {
+        this->id = id;
+        this->idf= idf;
+        this->name = name;
+    }
+
+    int Folder::GetId()
+    {
+        return id;
+    }
+
+    int Folder::GetIdFolder()
+    {
+        return idf;
+    }
+
+
+    DataGroup MenuItem::GetData()
+
     class Menu
     {
     private:
         
         int size_andIdCont=-1;
+        list<Folders> folders_list;
         list<MenuItem> menuData_list;
     public:
         Menu(/* args */);
@@ -82,7 +132,9 @@ namespace OledMenu
         int AddItem(int folder_id, string name, char *data);
         int AddItem(int folder_id, string name, bool data);
         int AddFolder(int folder_id, string name);
-        struct DataGroup GetItem(int itemID);
+        struct DataGroup GetData(int itemID);
+        MenuItem GetItem(int itemID);
+        void FinishSetup();
     };
     
     Menu::Menu(/* args */)
@@ -133,14 +185,51 @@ namespace OledMenu
     }
 
 
-    struct DataGroup Menu::GetItem(int itemID)
+    struct DataGroup Menu::GetData(int itemID)
     {
         list<MenuItem>::iterator mi = menuData_list.begin();
         advance(mi,itemID);
         MenuItem mid = *mi;
         return mid.GetData();
     }
-    
+
+    MenuItem Menu::GetItem(int itemID)
+    {
+        list<MenuItem>::iterator mi = menuData_list.begin();
+        advance(mi,itemID);
+        MenuItem mid = *mi;
+        return mid;
+    }
+
+
+    void Menu::FinishSetup(int *foldersIds, int *sizeFolders, int *itemsIds, int *sizeItems, int folderId)
+    {
+        int sizeF=0;
+        int sizeIte=0;
+        List<MenuItem>::iterator ite;
+        int id=0;
+
+        for (ite = menuData_list.begin(); ite != menuData_list.end(); ite++)
+        {
+            MenuItem mi = *ite.
+            if(mi.GetIfFolder() && mi.GetIdFolder() == folderId)
+            {
+                *foldersIds[id] = id;
+                sizeF++;  
+            }
+            else if( !mi.GetIfFolder() && mi.GetIdFolder() == folderId)
+            {
+                *itemsIds[id] = id;
+                sizeIte++;  
+            } 
+
+            id++;
+        }
+
+        *sizeFolders = sizeF;
+        *sizeItems = sizeIte;
+    }   
+
 }
 
 #endif
