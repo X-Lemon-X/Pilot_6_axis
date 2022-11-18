@@ -6,6 +6,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <WiFi.h>
+#include <esp_wifi.h>
 #include <list>
 #include "esp32-hal-cpu.h"
 
@@ -100,6 +101,13 @@ void setup() {
 
 
   Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  uint8_t newMACAddress[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
+  esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
+  WiFi.setHostname("Pyszne ciacteczka");
+  WiFi.begin("ForeverWIFI", "6TTZQWQ67NR9");
+  
+
   joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1, 0.80f);
   joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2, 0.95f);
 
@@ -138,11 +146,12 @@ void setup() {
   String str = "RC v";
   str += String(VERSION);
 
-  display.setTextSize(2);             
+  display.setTextSize(1);             
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(20,0);
   display.println(str);
-  display.display();
+  
+  display.setTextSize(1);    
 
 
   int core = xPortGetCoreID(); 
@@ -151,49 +160,46 @@ void setup() {
   else
     core = 1;
 
-  xTaskCreatePinnedToCore(loop2, "SecondLoop", 10000, NULL, 1, &SecondLoop, core);          
-
-  
-
-
-
+  display.setCursor(0,20);
+  display.println("Connecting to WiFi ..");
+  display.display();
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(100);
+  }
+  delay(500);
+  //xTaskCreatePinnedToCore(loop2, "SecondLoop", 10000, NULL, 1, &SecondLoop, core);        
+  //xTaskCreatePinnedToCore(loop1, "FirstLoop", 10000, NULL, 0, &SecondLoop, xPortGetCoreID());          
 
 }
 
 // Serialhandliing and wireless conections
 void loop() {
+  if(WiFi.status() == WL_CONNECTED){
+  display.clearDisplay();
+  display.setCursor(0,0);
+  display.println(WiFi.localIP());
+  display.setCursor(0,9);
+  display.print("RRSI: ");
+  display.println(WiFi.RSSI());
+  display.setCursor(0,20);
+  display.println(WiFi.macAddress());
+  display.display();
+  }
+  else{
+    display.clearDisplay();
+    display.setCursor(0,0);
+    display.print("disconnected");
+    display.display();
+  }
 
-  Serial.println("Start");
-
-  char *tetx = "jakiś tam text";
-
-  DataGroup dg;
-
-  Serial.println(tetx);
-
-  dg.type = OLEDMENU_STRING;
-  strcpy(dg.veriable.charD,tetx);
-
-  MenuItem om = MenuItem(1,-1,"name",dg);
-  
-  Serial.println(tetx);
-
-  strcpy(dg.veriable.charD, "zmiana");
-
-  Serial.println(tetx); 
-  
-  delay(10000);
-
+  delay(10);
 }
 
 
 // reding io and comunication hadler
 void loop2(void * pvParameters)
 {
-  for(;;)
-  {
-      ReadingInputs();
-  }
+ ReadingInputs();
 }
 
 void ReadingInputs()
