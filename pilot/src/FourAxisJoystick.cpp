@@ -49,14 +49,8 @@ using namespace IO_Control;
   int FourAxisJoystick::GetAvarageAnalog(int pin, int count)
   {
     int ava=0;
-    for (size_t i = 0; i < count; i++)
-    {
-      ava += analogRead(pin);
-      delay(1);
-    }
-
+    for (size_t i = 0; i < count; i++) ava += analogRead(pin);
     ava = ava / count;
-
     return ava;
   }
 
