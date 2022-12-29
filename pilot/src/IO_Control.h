@@ -19,6 +19,7 @@ namespace IO_Control
       int pinBtn;
       int map_min= -2048;
       int map_max= 2048;
+      int map_middle= 0;
 
       bool btn_prev;
 
@@ -35,13 +36,12 @@ namespace IO_Control
 
       int ReadAna(int pin,int offset, float *prev);
       void resolutionSet(int resolution);
-      int GetAvarageAnalog(int pin, int count);
 
     public:
       #define RESOLUTION_10_BIT 1026
       #define RESOLUTION_12_BIT 4096
 
-      FourAxisJoystick(/* args */);
+      FourAxisJoystick();
       ~FourAxisJoystick();
 
       void init(int resolution, int pinX, int pinY, int pinZ, int pinBtn, float softness);
@@ -62,12 +62,15 @@ namespace IO_Control
 
   class InOut
   {
-  private:
-    /* data */
-  public:
-    InOut(/* args */);
-    ~InOut();
-    static int ReadInput(int pin);
+    private:
+    
+    public:
+      InOut(/* args */);
+      ~InOut();
+      
+      static int ReadInput(int pin);
+      static int GetAvarageAnalog(int pin, int count);
+
   };
 }
 

@@ -5,10 +5,10 @@
 
 using namespace IO_Control;
 
-  FourAxisJoystick::FourAxisJoystick(/* args */)
-  {
+  FourAxisJoystick::FourAxisJoystick()
+  { 
   }
-  
+
   FourAxisJoystick::~FourAxisJoystick()
   {
   }
@@ -41,17 +41,9 @@ using namespace IO_Control;
 
   void FourAxisJoystick::AutoZero()
   {
-    offset_X = GetAvarageAnalog(pinX,30) - RESOLUTION/2;
-    offset_Y = GetAvarageAnalog(pinY,30) - RESOLUTION/2;
-    offset_Z = GetAvarageAnalog(pinZ,30) - RESOLUTION/2;
-  }
-
-  int FourAxisJoystick::GetAvarageAnalog(int pin, int count)
-  {
-    int ava=0;
-    for (size_t i = 0; i < count; i++) ava += analogRead(pin);
-    ava = ava / count;
-    return ava;
+    offset_X = InOut::GetAvarageAnalog(pinX,30) - RESOLUTION/2;
+    offset_Y = InOut::GetAvarageAnalog(pinY,30) - RESOLUTION/2;
+    offset_Z = InOut::GetAvarageAnalog(pinZ,30) - RESOLUTION/2;
   }
 
   void FourAxisJoystick::resolutionSet(int resolution)
@@ -112,9 +104,9 @@ using namespace IO_Control;
     *prev = value;
 
     if(value >= RESOLUTION/ 2)
-      return map((int)value, RESOLUTION/2, RESOLUTION - offset, 0, map_max);
+      return map((int)value, RESOLUTION/2, RESOLUTION - offset, map_middle, map_max);
     else
-      return map((int)value, - offset, RESOLUTION/2, map_min, 0);
+      return map((int)value, - offset, RESOLUTION/2, map_min, map_middle);
     
     //return map((int)value, 0, RESOLUTION , map_min, map_max);
   }

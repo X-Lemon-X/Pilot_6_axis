@@ -5,10 +5,15 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+
 #include <WiFi.h>
+#include <WiFiClient.h>
+#include <WebServer.h>
 #include <esp_wifi.h>
+
 #include <list>
 #include "esp32-hal-cpu.h"
+#include "SetingsPage.h"
 
 
 
@@ -59,8 +64,10 @@
 #define OLED_RESET 4
 
 Adafruit_SSD1306 display = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+WebServer server(80);
 
 using namespace OledMenu;
+using namespace IO_Control;
 
 struct InputsData
 {
@@ -88,29 +95,15 @@ IO_Control::FourAxisJoystick joystick1;
 IO_Control::FourAxisJoystick joystick2;
 InputsData inputs_main;
 
-
 TaskHandle_t SecondLoop;
 
+ 
 
 void ReadingInputs();
 void loop2(void * pvParameters);
 
-
-
-void setup() {
-
-
-  Serial.begin(115200);
-  WiFi.mode(WIFI_STA);
-  uint8_t newMACAddress[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
-  esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
-  WiFi.setHostname("Pyszne ciacteczka");
-  WiFi.begin("ForeverWIFI", "6TTZQWQ67NR9");
-  
-
-  joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1, 0.80f);
-  joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2, 0.95f);
-
+void GPIOinit()
+{
   pinMode(PIN_MS_BTN_1, INPUT_PULLUP);
   pinMode(PIN_MS_BTN_2, INPUT_PULLUP);
   pinMode(PIN_MS_BTN_3, INPUT_PULLUP);
@@ -131,9 +124,15 @@ void setup() {
   pinMode(PIN_Y_ROT_JOYSTIK_2, INPUT);
   pinMode(PIN_Z_ROT_JOYSTIK_2, INPUT);
 
+  joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1, 0.80f);
+  joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2, 0.95f);
+
   joystick1.AutoZero();
   joystick2.AutoZero();
+}
 
+void DisplayInit()
+{
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
   { 
     Serial.println(F("SSD1306 allocation failed"));
@@ -150,11 +149,53 @@ void setup() {
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(20,0);
   display.println(str);
-  
   display.setTextSize(1);    
+}
 
 
-  int core = xPortGetCoreID(); 
+void handleRoot() {
+ String s = MAIN_page; //Read HTML contents
+ server.send(200, "text/html", s); //Send web page
+}
+
+void InitAccessPoint()
+{
+  const char* ssid     = "Remote_Controler_4D";
+  const char* password = "123456789";
+ 
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ssid, password);
+  IPAddress IP = WiFi.softAPIP();
+  
+  Serial.println(WiFi.localIP());
+
+  server.on("/", handleRoot);      
+  server.begin(); 
+
+  while(1)
+  {
+    server.handleClient();
+    delay(1);
+  }
+}
+
+void InitSetupMode()
+{
+  InitAccessPoint();
+
+}
+
+void InitNormalMode()
+{
+
+    WiFi.mode(WIFI_STA);
+  uint8_t newMACAddress[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
+  esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
+  WiFi.setHostname("Pyszne ciacteczka");
+  WiFi.begin("ForeverWIFI", "6TTZQWQ67NR9");
+
+
+ int core = xPortGetCoreID(); 
   if(core == 1)
     core = 0;
   else
@@ -166,10 +207,22 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
   }
-  delay(500);
+
   //xTaskCreatePinnedToCore(loop2, "SecondLoop", 10000, NULL, 1, &SecondLoop, core);        
   //xTaskCreatePinnedToCore(loop1, "FirstLoop", 10000, NULL, 0, &SecondLoop, xPortGetCoreID());          
+}
 
+void setup() {
+
+  Serial.begin(115200);
+  
+  GPIOinit();
+  DisplayInit();
+
+  InitSetupMode();
+
+  if(InOut::ReadInput(PIN_MS_BTN_4) || InOut::ReadInput(PIN_MS_BTN_5)) InitSetupMode();
+  else InitNormalMode();
 }
 
 // Serialhandliing and wireless conections
@@ -215,14 +268,14 @@ void ReadingInputs()
   inputs_main.joystick_2_z = joystick2.readZ();
   inputs_main.joystick_2_btn = joystick2.readBtn();
 
-  inputs_main.btn_1 = IO_Control::InOut::ReadInput(PIN_MS_BTN_1);
-  inputs_main.btn_2 = IO_Control::InOut::ReadInput(PIN_MS_BTN_2);
-  inputs_main.btn_3 = IO_Control::InOut::ReadInput(PIN_MS_BTN_3);
-  inputs_main.btn_4 = IO_Control::InOut::ReadInput(PIN_MS_BTN_4);
-  inputs_main.btn_5 = IO_Control::InOut::ReadInput(PIN_MS_BTN_5);
-  inputs_main.btn_6 = IO_Control::InOut::ReadInput(PIN_MS_BTN_6);
-  inputs_main.btn_7 = IO_Control::InOut::ReadInput(PIN_MS_BTN_7);
-  inputs_main.btn_8 = IO_Control::InOut::ReadInput(PIN_MS_BTN_8);
+  inputs_main.btn_1 = InOut::ReadInput(PIN_MS_BTN_1);
+  inputs_main.btn_2 = InOut::ReadInput(PIN_MS_BTN_2);
+  inputs_main.btn_3 = InOut::ReadInput(PIN_MS_BTN_3);
+  inputs_main.btn_4 = InOut::ReadInput(PIN_MS_BTN_4);
+  inputs_main.btn_5 = InOut::ReadInput(PIN_MS_BTN_5);
+  inputs_main.btn_6 = InOut::ReadInput(PIN_MS_BTN_6);
+  inputs_main.btn_7 = InOut::ReadInput(PIN_MS_BTN_7);
+  inputs_main.btn_8 = InOut::ReadInput(PIN_MS_BTN_8);
 }
 
 
