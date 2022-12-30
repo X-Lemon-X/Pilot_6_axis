@@ -9,11 +9,15 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WebServer.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+
 #include <esp_wifi.h>
 
 #include <list>
 #include "esp32-hal-cpu.h"
 #include "SetingsPage.h"
+//#include "Setings.h"
 
 
 
@@ -64,7 +68,8 @@
 #define OLED_RESET 4
 
 Adafruit_SSD1306 display = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-WebServer server(80);
+//WebServer server(80);
+AsyncWebServer server(80);
 
 using namespace OledMenu;
 using namespace IO_Control;
@@ -152,10 +157,8 @@ void DisplayInit()
   display.setTextSize(1);    
 }
 
-
-void handleRoot() {
- String s = MAIN_page; //Read HTML contents
- server.send(200, "text/html", s); //Send web page
+void notFound(AsyncWebServerRequest *request) {
+  request->send(404, "text/plain", "Not found");
 }
 
 void InitAccessPoint()
@@ -165,18 +168,38 @@ void InitAccessPoint()
  
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, password);
-  IPAddress IP = WiFi.softAPIP();
-  
-  Serial.println(WiFi.localIP());
 
-  server.on("/", handleRoot);      
-  server.begin(); 
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", MAIN_page);
+  });
 
-  while(1)
-  {
-    server.handleClient();
-    delay(1);
-  }
+  server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String input_message;
+    String input_parameter;
+
+    if (request->hasParam("input1")) {
+      input_message = request->getParam("input1")->value();
+      input_parameter = "input1";
+    }
+    else if (request->hasParam("input2")) {
+      input_message = request->getParam("input2")->value();
+      input_parameter = "input2";
+    }
+
+    else if (request->hasParam("input3")) {
+      input_message = request->getParam("input3")->value();
+      input_parameter = "input3";
+    }
+    else {
+      input_message = "No message sent";
+      input_parameter = "none";
+    }
+    Serial.println(input_message);
+    request->send(200, "text/html", "HTTP GET request sent to your ESP on input field ("+ input_parameter + ") with value: " + input_message + "<br><a href=\"/\">Return to Home Page</a>");
+  });
+
+  server.onNotFound(notFound);
+  server.begin();
 }
 
 void InitSetupMode()

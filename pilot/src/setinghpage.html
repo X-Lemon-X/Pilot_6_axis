@@ -20,20 +20,29 @@
             <td contenteditable='false'>VALUES</td>
         </tr>
         <tr>
-            <td contenteditable='false'>hejo</td>
             <td contenteditable='true'>hejo</td>
+            <td <form action="/get">
+                <input type="text" name="input1">
+                <input type="submit" value="Save" id="input1_btn" onclick="SaveSetings(id)">
+                </form><br>
+            </td>
         </tr>
+
         <tr>
-            <td contenteditable='false'>hejo</td>
             <td contenteditable='true'>hejo</td>
+            <td <form action="/get">
+                <input type="text" name="input2">
+                <input type="submit" value="Save" id="input2_btn" onclick="SaveSetings(id)">
+                </form><br>
+            </td>
         </tr>
     </tbody>
     </table>
     
     <script>
-        function SaveSetings() {
+        function SaveSetings( value ) {
 
-        document.getElementById("save_btn").style.color = "red";
+        document.getElementById(value).style.color = "red";
         }
     </script>
 </body>
