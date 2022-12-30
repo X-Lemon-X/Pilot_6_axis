@@ -17,7 +17,7 @@
 #include <list>
 #include "esp32-hal-cpu.h"
 #include "SetingsPage.h"
-//#include "Setings.h"
+#include "Setings.h"
 
 
 
@@ -104,6 +104,9 @@ const char* input_parameter1 = "input_string";
 const char* input_parameter2 = "input_integer";
 const char* input_parameter3 = "input_float";
 
+Setings::Setings setings_data;
+
+
 TaskHandle_t SecondLoop;
 
  //https://microcontrollerslab.com/esp32-esp8266-web-server-input-data-html-forms/
@@ -161,7 +164,7 @@ void DisplayInit()
   display.setTextSize(1);    
 }
 
-void notFound(AsyncWebServerRequest *request) {
+void PageNotFound(AsyncWebServerRequest *request) {
   request->send(404, "text/plain", "Not found");
 }
 
@@ -178,31 +181,17 @@ void InitAccessPoint()
   });
 
   server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    String input_message;
-    String input_parameter;
-
-   if (request->hasParam(input_parameter1)) {
-      input_message = request->getParam(input_parameter1)->value();
-      input_parameter = input_parameter1;
+    int errors_count=0; 
+    for (size_t i = 0; i < request->params(); i++)
+    {
+      String val = request->getParam(i)->value;
+      errors_count += setings_data.UpdateSeting(request->getParam(i)->name, val) == Setings::ERRORS_OK ? 0 : 1;
     }
-    else if (request->hasParam(input_parameter2)) {
-      input_message = request->getParam(input_parameter2)->value();
-      input_parameter = input_parameter2;
-    }
-
-    else if (request->hasParam(input_parameter3)) {
-      input_message = request->getParam(input_parameter3)->value();
-      input_parameter = input_parameter3;
-    }
-    else {
-      input_message = "No message sent";
-      input_parameter = "none";
-    }
-    Serial.println(input_message);
-    request->send(200, "text/html", "HTTP GET request sent to your ESP on input field ("+ input_parameter + ") with value: " + input_message + "<br><a href=\"/\">Return to Home Page</a>");
+   request->send(200, "text/html", "Setings send to be updated <br><a href=\"/\">Return to Home Page</a>");
   });
 
-  server.onNotFound(notFound);
+
+  server.onNotFound(PageNotFound);
   server.begin();
 }
 
@@ -284,7 +273,6 @@ void loop2(void * pvParameters)
 
 void ReadingInputs()
 {
-  
   inputs_main.joystick_1_x = joystick1.readX();
   inputs_main.joystick_1_y = joystick1.readY();
   inputs_main.joystick_1_z = joystick1.readZ();
