@@ -100,9 +100,13 @@ IO_Control::FourAxisJoystick joystick1;
 IO_Control::FourAxisJoystick joystick2;
 InputsData inputs_main;
 
+const char* input_parameter1 = "input_string";
+const char* input_parameter2 = "input_integer";
+const char* input_parameter3 = "input_float";
+
 TaskHandle_t SecondLoop;
 
- 
+ //https://microcontrollerslab.com/esp32-esp8266-web-server-input-data-html-forms/
 
 void ReadingInputs();
 void loop2(void * pvParameters);
@@ -177,18 +181,18 @@ void InitAccessPoint()
     String input_message;
     String input_parameter;
 
-    if (request->hasParam("input1")) {
-      input_message = request->getParam("input1")->value();
-      input_parameter = "input1";
+   if (request->hasParam(input_parameter1)) {
+      input_message = request->getParam(input_parameter1)->value();
+      input_parameter = input_parameter1;
     }
-    else if (request->hasParam("input2")) {
-      input_message = request->getParam("input2")->value();
-      input_parameter = "input2";
+    else if (request->hasParam(input_parameter2)) {
+      input_message = request->getParam(input_parameter2)->value();
+      input_parameter = input_parameter2;
     }
 
-    else if (request->hasParam("input3")) {
-      input_message = request->getParam("input3")->value();
-      input_parameter = "input3";
+    else if (request->hasParam(input_parameter3)) {
+      input_message = request->getParam(input_parameter3)->value();
+      input_parameter = input_parameter3;
     }
     else {
       input_message = "No message sent";

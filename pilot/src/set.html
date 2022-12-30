@@ -1,4 +1,3 @@
-const char MAIN_page[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html><head>
     <title>HTML Form to Input Data</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,30 +13,27 @@ const char MAIN_page[] PROGMEM = R"rawliteral(
   <tbody>
   
   <tr>
-  <td>str</td>
     <td>
     <form action="/get">
-      <input type="text" name="input_string">
+      Enter a string: <input type="text" name="input_string">
       <input type="submit" value="Submit">
     </form><br>
 </td>
   </tr>
   
   <tr>
-  <td>int</td>
     <td>
     <form action="/get">
-      <input type="text" name="input_integer">
+      Enter an integer: <input type="text" name="input_integer">
       <input type="submit" value="Submit">
     </form><br>
     </td>
   </tr>
   
   <tr>
-  <td>float</td>
     <td>
     <form action="/get">
-      <input type="text" name="input_float">
+      Enter a floating value: <input type="text" name="input_float">
       <input type="submit" value="Submit">
     </form>
 </td>  
@@ -46,4 +42,4 @@ const char MAIN_page[] PROGMEM = R"rawliteral(
   </tbody>
       </table>
   
-  </body></html>)rawliteral";
+  </body></html>)rawliteral
