@@ -103,6 +103,7 @@ InputsData inputs_main;
 const char* input_parameter1 = "input_string";
 const char* input_parameter2 = "input_integer";
 const char* input_parameter3 = "input_float";
+const char* page="";
 
 Setings::Setings setings_data;
 
@@ -113,6 +114,13 @@ TaskHandle_t SecondLoop;
 
 void ReadingInputs();
 void loop2(void * pvParameters);
+
+void LoadSetings()
+{
+  setings_data.AddSeting("ver1",213);
+  setings_data.AddSeting("ver2",4);
+  setings_data.AddSeting("ver3",6);
+}
 
 void GPIOinit()
 {
@@ -176,16 +184,32 @@ void InitAccessPoint()
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, password);
 
+  std::string val_table_mid = "";
+
+  for (auto element = setings_data._setings.begin(); element!= setings_data._setings.end(); ++element)
+  {
+    val_table_mid = val_table_mid + "\n <tr><td>" + element->first + "</td> <td><input type=\"text\" name=\"" 
+    + element->first+ "\" value=\""+ Setings::GetStringFromSeting(element->second)+"\"></td> </tr>"; 
+  }
+
+  std::string val_page_beg=MAIN_page_beg;
+  std::string val_page_end=MAIN_page_end;
+  std::string val_page = val_page_beg + val_table_mid.c_str() + val_page_end;  
+  page = val_page_beg.c_str();
+
+
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", MAIN_page);
+    request->send_P(200, "text/html", page);
   });
 
   server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
     int errors_count=0; 
     for (size_t i = 0; i < request->params(); i++)
     {
-      String val = request->getParam(i)->value;
-      errors_count += setings_data.UpdateSeting(request->getParam(i)->name, val) == Setings::ERRORS_OK ? 0 : 1;
+      Serial.print(request->getParam(i)->name().c_str());
+      Serial.print("   ->   ");
+      Serial.println(request->getParam(i)->value().c_str());
+      errors_count += setings_data.UpdateSeting(request->getParam(i)->name().c_str(), request->getParam(i)->value().c_str()) == Setings::ERRORS_OK ? 0 : 1;
     }
    request->send(200, "text/html", "Setings send to be updated <br><a href=\"/\">Return to Home Page</a>");
   });
@@ -234,6 +258,7 @@ void setup() {
   
   GPIOinit();
   DisplayInit();
+  LoadSetings();
 
   InitSetupMode();
 

@@ -36,11 +36,10 @@ namespace Setings
     class Setings
     {
         private:
-            std::map<string, setings_seting> _setings;
-        
-        
-        public:
             
+        public:
+            //static std::string GetStringFromSeting( setings_seting seting);
+            std::map<string, setings_seting> _setings;
             void AddSeting(std::string name, int seting);
             void AddSeting(std::string name, float seting);
             void AddSeting(std::string name, bool seting);
@@ -56,6 +55,24 @@ namespace Setings
             ~Setings();
     }; 
 
+    static std::string GetStringFromSeting( setings_seting seting)
+    {
+        switch (seting.type)
+        {
+            case _int:
+                return std::to_string(seting.data._int);
+            
+            case _float:
+                return std::to_string(seting.data._float);
+            case _string:
+                //ss.data._string = input_data;
+            break;
+            case _bool:
+                return std::to_string(seting.data._bool);
+            break;
+            return "";
+        }
+    }
 
     int Setings::GetSeting(std::string name, setings_seting *seting)
     {
@@ -117,7 +134,7 @@ namespace Setings
                     ss.data._float = std::stof(input_data);
                 break;
                 case _string:
-                    ss.data._string = &input_data;
+                    //ss.data._string = input_data;
                 break;
                 case _bool:
                     ss.data._bool = std::stoi(input_data)>0 ? 1 : 0;

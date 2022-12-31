@@ -1,49 +1,26 @@
-const char MAIN_page[] PROGMEM = R"rawliteral(
+const char MAIN_page_beg[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html><head>
-    <title>HTML Form to Input Data</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-      html {font-family: Times New Roman; display: inline-block; text-align: center;}
-      h2 {font-size: 3.0rem; color: #FF0000;}
-    </style>
-    </head><body>
-    <h2>HTML Form to Input Data</h2> 
-  
-  
+  <title>HTML Form to Input Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html {font-family: Times New Roman; display: inline-block; text-align: center;}
+    h2 {font-size: 3.0rem; color: #FF0000;}
+  </style>
+  </head><body>
+  <h2>HTML Form to Input Data</h2> 
+
+  <form action="/get">
   <table border="1">
   <tbody>
   
   <tr>
-  <td>str</td>
-    <td>
-    <form action="/get">
-      <input type="text" name="input_string">
-      <input type="submit" value="Submit">
-    </form><br>
-</td>
-  </tr>
-  
-  <tr>
-  <td>int</td>
-    <td>
-    <form action="/get">
-      <input type="text" name="input_integer">
-      <input type="submit" value="Submit">
-    </form><br>
-    </td>
-  </tr>
-  
-  <tr>
-  <td>float</td>
-    <td>
-    <form action="/get">
-      <input type="text" name="input_float">
-      <input type="submit" value="Submit">
-    </form>
-</td>  
-</tr>
-  
-  </tbody>
-      </table>
-  
-  </body></html>)rawliteral";
+      <td>VERIABLES</td>
+      <td>VALUES</td>
+  </tr>)rawliteral";
+
+  const char MAIN_page_end[] PROGMEM = R"rawliteral(
+</tbody>
+</table>
+<input type="submit" value="Save">
+</form>
+</body></html>)rawliteral";
