@@ -77,7 +77,7 @@ int lineCount=0;
 #define WIFI_SETINGS_BEG_NAME "str_WIFI_"
 #define WIFI_CONNECTION_TRY_MAX_COUNT 10
 #define WIFI_PASSWORD_LENGTH 15
-#define WIFI_NAME "REMOCON"
+const char* WIFI_NAME = "remocon";
 uint8_t newMACAddress[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
 const char* ssid     = "Remote_Controler_4D";
 std::string WIFIpasssword="123456789";
@@ -205,7 +205,7 @@ void PrintSetings(Setings::Setings setings)
   for(auto element=setings._setings.begin(); element != setings._setings.end(); element++ )
   {
     UpdateLine(String(element->first.c_str()),5);
-    UpdateLine(PrintSeting(element->second),6);
+    UpdateLine(PrintSeting(element->second));
   }
 }
 
@@ -404,7 +404,6 @@ void ConnectWithAvailableWIfiNetwork()
 {
   WiFi.mode(WIFI_STA);
   esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
-  WiFi.setHostname(WIFI_NAME);
   WiFi.disconnect();
   bool notConnected=true;
 
