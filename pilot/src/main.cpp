@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "IO_Control.h"
 #include "OledMenu.h"
+#include "PassGenerator.h"
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -67,6 +68,20 @@
 #define WIRE Wire
 #define OLED_RESET 4
 
+#define DISPLAY_MAX_LINE_COUNT 7
+String displayLines[DISPLAY_MAX_LINE_COUNT];
+int lineCount=0;
+
+
+//-----------------------------WIFI_SETUP
+#define WIFI_SETINGS_BEG_NAME "str_WIFI_"
+#define WIFI_CONNECTION_TRY_MAX_COUNT 10
+#define WIFI_PASSWORD_LENGTH 15
+#define WIFI_NAME "REMOCON"
+uint8_t newMACAddress[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
+const char* ssid     = "Remote_Controler_4D";
+std::string WIFIpasssword="123456789";
+
 Adafruit_SSD1306 display = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 //WebServer server(80);
 AsyncWebServer server(80);
@@ -100,11 +115,6 @@ IO_Control::FourAxisJoystick joystick1;
 IO_Control::FourAxisJoystick joystick2;
 InputsData inputs_main;
 
-const char* input_parameter1 = "input_string";
-const char* input_parameter2 = "input_integer";
-const char* input_parameter3 = "input_float";
-const char* page="";
-
 Setings::Setings setings_data;
 
 
@@ -115,11 +125,146 @@ TaskHandle_t SecondLoop;
 void ReadingInputs();
 void loop2(void * pvParameters);
 
+
+void DislpayPrint(String line, bool pushLine, bool updateLine)
+{
+  if(pushLine)
+  line = displayLines[DISPLAY_MAX_LINE_COUNT-1] + line;
+  else if(updateLine)
+    displayLines[DISPLAY_MAX_LINE_COUNT-1] = line;
+  else 
+    for(int i=1; i < DISPLAY_MAX_LINE_COUNT; i++) displayLines[i-1] = displayLines[i];
+  
+  displayLines[DISPLAY_MAX_LINE_COUNT-1] = line;
+
+  display.clearDisplay();
+  display.setCursor(0,0); 
+
+  for(int i=1; i < DISPLAY_MAX_LINE_COUNT; i++)
+  { 
+    display.setCursor(0,9*(i-1));
+    std::string str = displayLines[i].c_str();
+    str.resize(22);
+    display.print(String(str.c_str()));
+  }
+  display.display();
+}
+
+void DislpayPrint(String line[10])
+{
+  display.clearDisplay();
+  display.setCursor(0,0); 
+
+  for(int i=0; i < DISPLAY_MAX_LINE_COUNT; i++)
+  { 
+    display.setCursor(0,9*i);
+    std::string str = displayLines[i].c_str();
+    str.resize(22);
+    display.print(String(str.c_str()));
+  }
+  display.display();
+}
+
+void UpdateLine(String string, int line)
+{
+  if(line >= DISPLAY_MAX_LINE_COUNT) line = DISPLAY_MAX_LINE_COUNT-1;
+  else if (line < 0) line =0;
+
+  displayLines[line] = string;
+  DislpayPrint(displayLines);
+  Serial.println(string);
+}
+
+void UpdateLine(String string)
+{
+  UpdateLine(string,DISPLAY_MAX_LINE_COUNT-1);
+}
+
+void Print(String string)
+{
+  string = displayLines[DISPLAY_MAX_LINE_COUNT-1] + string;
+  displayLines[DISPLAY_MAX_LINE_COUNT-1] = string;
+  DislpayPrint(displayLines);
+  Serial.print(string);
+}
+
+void Println(String string)
+{
+  for(int i=1; i < DISPLAY_MAX_LINE_COUNT; i++) displayLines[i-1] = displayLines[i];
+  displayLines[DISPLAY_MAX_LINE_COUNT-1] = string;
+  DislpayPrint(displayLines);
+  Serial.println(string);
+}
+
+void PrintSetings(Setings::Setings setings)
+{
+  Println("Setings:");
+  Println("ver:");
+  Println("");
+  Println("");
+  for(auto element=setings._setings.begin(); element != setings._setings.end(); element++ )
+  {
+    UpdateLine(String(element->first.c_str()),5);
+    UpdateLine(PrintSeting(element->second),6);
+  }
+}
+
 void LoadSetings()
 {
-  setings_data.AddSeting("ver1",213);
-  setings_data.AddSeting("ver2",4);
-  setings_data.AddSeting("ver3",6);
+
+  #pragma region Joysticks
+  setings_data.AddSeting("int_Joystick_left_MMin",-2048);
+  setings_data.AddSeting("int_Joystick_left_MMax",2048);
+
+  setings_data.AddSeting("int_Joystick_right_MMin",-2048);
+  setings_data.AddSeting("int_Joystick_right_MMax",2048);
+
+  setings_data.AddSeting("int_Joystick_right_filer",0.95f);
+  setings_data.AddSeting("int_Joystick_left_filer",0.95f);
+
+  #pragma endregion
+
+  #pragma region Buttons
+
+  setings_data.AddSeting("bool_Btns_Mstable",string("0,0,0,0,0,0,0,0"));
+
+  #pragma endregion
+
+  #pragma region WIFI
+
+  setings_data.AddSeting("str_host_wifi",string("192.168.1.1"));
+
+  setings_data.AddSeting("str_WIFI_1_S",string("ForeverWIFI"));
+  setings_data.AddSeting("str_WIFI_1_P",string("6TTZQWQ67NR9"));
+
+  setings_data.AddSeting("str_WIFI_2_S",string("400%mocy"));
+  setings_data.AddSeting("str_WIFI_2_P",string("qwerty987654321"));
+
+  setings_data.AddSeting("str_WIFI_3_S",string(""));
+  setings_data.AddSeting("str_WIFI_3_P",string(""));
+  
+  setings_data.AddSeting("str_WIFI_4_S",string(""));
+  setings_data.AddSeting("str_WIFI_4_P",string(""));
+
+  setings_data.AddSeting("str_WIFI_5_S",string(""));
+  setings_data.AddSeting("str_WIFI_5_P",string(""));
+
+  setings_data.AddSeting("str_WIFI_6_S",string(""));
+  setings_data.AddSeting("str_WIFI_6_P",string(""));
+
+  setings_data.AddSeting("str_WIFI_7_S",string(""));
+  setings_data.AddSeting("str_WIFI_7_P",string(""));
+
+  setings_data.AddSeting("str_WIFI_8_S",string(""));
+  setings_data.AddSeting("str_WIFI_8_P",string(""));
+
+  setings_data.AddSeting("str_WIFI_9_S",string(""));
+  setings_data.AddSeting("str_WIFI_9_P",string(""));
+  #pragma endregion
+
+  setings_data.InitEPPROM();
+  //setings_data.SaveSetingsToFlash();
+  setings_data.LoadSetingsFromFlash();
 }
 
 void GPIOinit()
@@ -144,9 +289,19 @@ void GPIOinit()
   pinMode(PIN_Y_ROT_JOYSTIK_2, INPUT);
   pinMode(PIN_Z_ROT_JOYSTIK_2, INPUT);
 
-  joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1, 0.80f);
-  joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2, 0.95f);
+  //joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1, 0.80f);
+  //joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2, 0.95f);
+  
+  joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1,
+    setings_data.GetSeting("int_Joystick_left_filer").data._float,
+    setings_data.GetSeting("int_Joystick_left_MMin").data._int,
+    setings_data.GetSeting("int_Joystick_left_MMax").data._int);
 
+  joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2,
+    setings_data.GetSeting("int_Joystick_right_filer").data._float,
+    setings_data.GetSeting("int_Joystick_right_MMin").data._int,
+    setings_data.GetSeting("int_Joystick_right_MMax").data._int);
+  
   joystick1.AutoZero();
   joystick2.AutoZero();
 }
@@ -158,60 +313,55 @@ void DisplayInit()
     Serial.println(F("SSD1306 allocation failed"));
     for(;;);
   }
-
   display.display();
   display.clearDisplay();
-  
-  String str = "RC v";
-  str += String(VERSION);
-
   display.setTextSize(1);             
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(20,0);
-  display.println(str);
-  display.setTextSize(1);    
+  display.display();
 }
 
 void PageNotFound(AsyncWebServerRequest *request) {
   request->send(404, "text/plain", "Not found");
 }
 
-void InitAccessPoint()
+void InitAllWebEvents()
 {
-  const char* ssid     = "Remote_Controler_4D";
-  const char* password = "123456789";
- 
+  //WIFIpasssword = PassGenerator_GeneratePassword(WIFI_PASSWORD_LENGTH);
+
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(ssid, password);
-
-  std::string val_table_mid = "";
-
-  for (auto element = setings_data._setings.begin(); element!= setings_data._setings.end(); ++element)
-  {
-    val_table_mid = val_table_mid + "\n <tr><td>" + element->first + "</td> <td><input type=\"text\" name=\"" 
-    + element->first+ "\" value=\""+ Setings::GetStringFromSeting(element->second)+"\"></td> </tr>"; 
-  }
-
-  std::string val_page_beg=MAIN_page_beg;
-  std::string val_page_end=MAIN_page_end;
-  std::string val_page = val_page_beg + val_table_mid.c_str() + val_page_end;  
-  page = val_page_beg.c_str();
-
+  WiFi.softAP(ssid, WIFIpasssword.c_str());
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", page);
+    
+    std::string val_table_mid = "";
+    for (auto element = setings_data._setings.begin(); element!= setings_data._setings.end(); ++element)
+    {
+      val_table_mid = val_table_mid + "\n <tr><td>" + element->first + "</td> <td><input type=\"text\" name=\"" 
+      + element->first+ "\" value=\""+ Setings::GetStringFromSeting(element->second)+"\"></td> </tr>"; 
+    }
+    std::string val_page = string(MAIN_page_beg) + val_table_mid.c_str() + string(MAIN_page_end);  
+
+
+
+    request->send_P(200, "text/html", val_page.c_str());
   });
+
 
   server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
     int errors_count=0; 
     for (size_t i = 0; i < request->params(); i++)
     {
-      Serial.print(request->getParam(i)->name().c_str());
-      Serial.print("   ->   ");
-      Serial.println(request->getParam(i)->value().c_str());
-      errors_count += setings_data.UpdateSeting(request->getParam(i)->name().c_str(), request->getParam(i)->value().c_str()) == Setings::ERRORS_OK ? 0 : 1;
+      int err ;
+      Println(request->getParam(i)->name().c_str());
+      Println(request->getParam(i)->value().c_str());
+      err = setings_data.UpdateSeting(request->getParam(i)->name().c_str(), request->getParam(i)->value().c_str());
+      Println("code:" + String(err));
+      errors_count +=err;
     }
-   request->send(200, "text/html", "Setings send to be updated <br><a href=\"/\">Return to Home Page</a>");
+   std::string val_page = "Setings [" +to_string(request->params())+ "] send to be updated, not updated [" + 
+   to_string(errors_count) + "] <br><a href=\"/\">Return to Setings Page</a>";
+   setings_data.SaveSetingsToFlash();
+   request->send(200, "text/html", val_page.c_str());
   });
 
 
@@ -221,19 +371,107 @@ void InitAccessPoint()
 
 void InitSetupMode()
 {
-  InitAccessPoint();
+  InitAllWebEvents();
+  Println("Setup mode");
+  Println("192.168.4.1");
+  Println(WIFIpasssword.c_str());
+}
 
+bool FindWifiNetwork(String ssid, String *password, int *num)
+{
+  for(auto elemnt=setings_data._setings.begin(); elemnt!=setings_data._setings.end(); elemnt++ )
+  {
+    std::string beg = elemnt->first ;
+    beg.resize(9);
+    if(beg ==  WIFI_SETINGS_BEG_NAME)
+    {
+      //Println("Name:" + String(elemnt->first.c_str()) + " val:" + String(elemnt->second.data._string));
+      *num = std::stoi(elemnt->first.substr(9,1));
+      std::string type = elemnt->first.substr(elemnt->first.size()-1,1);
+      if(type == "S" && string(elemnt->second.data._string) == string(ssid.c_str()))
+      {
+        std::string name = elemnt->first.substr(0,11) + "P";
+        auto ss = setings_data._setings[name];
+        *password = String(ss.data._string);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+void ConnectWithAvailableWIfiNetwork()
+{
+  WiFi.mode(WIFI_STA);
+  esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
+  WiFi.setHostname(WIFI_NAME);
+  WiFi.disconnect();
+  bool notConnected=true;
+
+  String wifi[10][2];
+  bool available[10];
+
+  for (size_t i = 0; i < 10; i++)
+  {
+    available[i]=false;
+    wifi[i][0]="";
+    wifi[i][1]="";
+  }
+  
+  while (notConnected)
+  {
+    int i = WiFi.scanNetworks();
+    if(i>0)
+    {
+      for (int count = 0; count < i; count++)
+      {        
+        String passwd;
+        String ssid= WiFi.SSID(count);
+        Println("CH? ssid:"+ssid);
+        int num=0;
+        if(FindWifiNetwork(ssid,&passwd,&num))
+        {  
+          Println("Available");
+          available[num]= true;
+          wifi[num][0] = ssid;
+          wifi[num][1] = passwd;
+        }
+      } 
+
+      for (size_t i = 0; i < 10; i++)
+      {
+        //Println("CH? num"  + String(i));
+        if(available[i])
+        {
+          Println("ssid:"+wifi[i][0]);
+          Println("pass:"+wifi[i][1]);
+          WiFi.begin(wifi[i][0].c_str(), wifi[i][1].c_str());
+          int connectionTryCount=0;
+          
+          Println("");
+          while (WiFi.status() != WL_CONNECTED) {
+            Print(".");
+            delay(100);
+            if(WIFI_CONNECTION_TRY_MAX_COUNT == connectionTryCount++) break;
+          }
+          
+          if(WiFi.status() == WL_CONNECTED){
+            Println("Connected to:");
+            Println(wifi[i][0]);
+            Println(WiFi.localIP().toString());
+            notConnected = false;
+            break;
+          }
+        }
+      }
+    }
+    delay(50);
+  }
 }
 
 void InitNormalMode()
 {
-
-    WiFi.mode(WIFI_STA);
-  uint8_t newMACAddress[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
-  esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
-  WiFi.setHostname("Pyszne ciacteczka");
-  WiFi.begin("ForeverWIFI", "6TTZQWQ67NR9");
-
+  ConnectWithAvailableWIfiNetwork();
 
  int core = xPortGetCoreID(); 
   if(core == 1)
@@ -241,54 +479,45 @@ void InitNormalMode()
   else
     core = 1;
 
-  display.setCursor(0,20);
-  display.println("Connecting to WiFi ..");
-  display.display();
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(100);
-  }
 
   //xTaskCreatePinnedToCore(loop2, "SecondLoop", 10000, NULL, 1, &SecondLoop, core);        
   //xTaskCreatePinnedToCore(loop1, "FirstLoop", 10000, NULL, 0, &SecondLoop, xPortGetCoreID());          
 }
 
+
 void setup() {
 
-  Serial.begin(115200);
-  
-  GPIOinit();
   DisplayInit();
   LoadSetings();
 
-  InitSetupMode();
+  //setings_data.GetSeting("int_COM_BaudRate").data._int
+  Serial.begin(115200);
+  PrintSetings(setings_data);
+  
+  GPIOinit();
 
-  if(InOut::ReadInput(PIN_MS_BTN_4) || InOut::ReadInput(PIN_MS_BTN_5)) InitSetupMode();
+  if(!InOut::ReadInput(PIN_MS_BTN_4) || !InOut::ReadInput(PIN_MS_BTN_5)) InitSetupMode();
   else InitNormalMode();
 }
 
 // Serialhandliing and wireless conections
 void loop() {
-  if(WiFi.status() == WL_CONNECTED){
-  display.clearDisplay();
-  display.setCursor(0,0);
-  display.println(WiFi.localIP());
-  display.setCursor(0,9);
-  display.print("RRSI: ");
-  display.println(WiFi.RSSI());
-  display.setCursor(0,20);
-  display.println(WiFi.macAddress());
-  display.display();
-  }
-  else{
-    display.clearDisplay();
-    display.setCursor(0,0);
-    display.print("disconnected");
-    display.display();
-  }
 
-  delay(10);
+  wl_status_t statusPrev=WL_IDLE_STATUS;
+  while(true)
+  {
+    wl_status_t status =  WiFi.status();
+    if(status!= statusPrev )
+    {
+      if(status != WL_CONNECTED)
+      { 
+        Println("disconnected");
+        ConnectWithAvailableWIfiNetwork();
+      }
+    }
+    statusPrev = status;
+  }
 }
-
 
 // reding io and comunication hadler
 void loop2(void * pvParameters)
