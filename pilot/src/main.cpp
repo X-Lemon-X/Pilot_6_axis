@@ -372,8 +372,8 @@ void InitAllWebEvents()
 void InitSetupMode()
 {
   InitAllWebEvents();
-  Println("Setup mode");
-  Println("192.168.4.1");
+  Println("--Setup mode--");
+  Println("http://192.168.4.1");
   Println(WIFIpasssword.c_str());
 }
 
@@ -479,6 +479,20 @@ void InitNormalMode()
   else
     core = 1;
 
+   wl_status_t statusPrev=WL_IDLE_STATUS;
+  while(true)
+  {
+    wl_status_t status =  WiFi.status();
+    if(status!= statusPrev )
+    {
+      if(status != WL_CONNECTED)
+      { 
+        Println("disconnected");
+        ConnectWithAvailableWIfiNetwork();
+      }
+    }
+    statusPrev = status;
+  }
 
   //xTaskCreatePinnedToCore(loop2, "SecondLoop", 10000, NULL, 1, &SecondLoop, core);        
   //xTaskCreatePinnedToCore(loop1, "FirstLoop", 10000, NULL, 0, &SecondLoop, xPortGetCoreID());          
@@ -503,20 +517,6 @@ void setup() {
 // Serialhandliing and wireless conections
 void loop() {
 
-  wl_status_t statusPrev=WL_IDLE_STATUS;
-  while(true)
-  {
-    wl_status_t status =  WiFi.status();
-    if(status!= statusPrev )
-    {
-      if(status != WL_CONNECTED)
-      { 
-        Println("disconnected");
-        ConnectWithAvailableWIfiNetwork();
-      }
-    }
-    statusPrev = status;
-  }
 }
 
 // reding io and comunication hadler
