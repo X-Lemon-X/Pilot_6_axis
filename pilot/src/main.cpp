@@ -2,6 +2,7 @@
 #include "IO_Control.h"
 #include "OledMenu.h"
 #include "PassGenerator.h"
+#include "OledPrintLib.h"
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -15,7 +16,7 @@
 
 #include <esp_wifi.h>
 
-#include <list>
+//#include <list>
 #include "esp32-hal-cpu.h"
 #include "SetingsPage.h"
 #include "Setings.h"
@@ -28,10 +29,15 @@
 
 //for use of dual cores refere to https://randomnerdtutorials.com/esp32-dual-core-arduino-ide/
 
+//------------DEBUG
+
+#define DEBUG
+
+#define DEBB #ifdef DEBUG
+#define DEBE #endif
 
 //-----------------------------INFO
-#define VERSION 1.2
-
+#define VERSION 1.3
 
 
 //-----------------------------JOYSTICKS PINOUT
@@ -114,6 +120,7 @@ struct InputsData
 IO_Control::FourAxisJoystick joystick1;
 IO_Control::FourAxisJoystick joystick2;
 InputsData inputs_main;
+OledPrintLib *oledPrint = NULL;
 
 Setings::Setings setings_data;
 
@@ -125,7 +132,7 @@ TaskHandle_t SecondLoop;
 void ReadingInputs();
 void loop2(void * pvParameters);
 
-
+/*
 void DislpayPrint(String line, bool pushLine, bool updateLine)
 {
   if(pushLine)
@@ -196,6 +203,28 @@ void Println(String string)
   Serial.println(string);
 }
 
+*/
+
+void Print(String string)
+{
+  oledPrint->Print(string);
+}
+
+void Println(String string)
+{
+  oledPrint->Println(string);
+}
+
+void UpdateLine(String string)
+{
+  oledPrint->UpdateLine(string);
+}
+
+void UpdateLine(String string, int line)
+{
+  oledPrint->UpdateLine(string,line);
+}
+
 void PrintSetings(Setings::Setings setings)
 {
   Println("Setings:");
@@ -233,6 +262,8 @@ void LoadSetings()
   #pragma region WIFI
 
   setings_data.AddSeting("str_host_wifi",string("192.168.1.1"));
+  setings_data.AddSeting("str_host_port",25000);
+  setings_data.AddSeting("str_host_password",string("qwerty"));
 
   setings_data.AddSeting("str_WIFI_1_S",string("ForeverWIFI"));
   setings_data.AddSeting("str_WIFI_1_P",string("6TTZQWQ67NR9"));
@@ -252,14 +283,6 @@ void LoadSetings()
   setings_data.AddSeting("str_WIFI_6_S",string(""));
   setings_data.AddSeting("str_WIFI_6_P",string(""));
 
-  setings_data.AddSeting("str_WIFI_7_S",string(""));
-  setings_data.AddSeting("str_WIFI_7_P",string(""));
-
-  setings_data.AddSeting("str_WIFI_8_S",string(""));
-  setings_data.AddSeting("str_WIFI_8_P",string(""));
-
-  setings_data.AddSeting("str_WIFI_9_S",string(""));
-  setings_data.AddSeting("str_WIFI_9_P",string(""));
   #pragma endregion
 
   setings_data.InitEPPROM();
@@ -311,13 +334,16 @@ void DisplayInit()
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
   { 
     Serial.println(F("SSD1306 allocation failed"));
-    for(;;);
+    exit(1);
   }
+
   display.display();
   display.clearDisplay();
   display.setTextSize(1);             
   display.setTextColor(SSD1306_WHITE);
   display.display();
+  oledPrint = new OledPrintLib(&display, DISPLAY_MAX_LINE_COUNT);
+
 }
 
 void PageNotFound(AsyncWebServerRequest *request) {
@@ -340,8 +366,6 @@ void InitAllWebEvents()
       + element->first+ "\" value=\""+ Setings::GetStringFromSeting(element->second)+"\"></td> </tr>"; 
     }
     std::string val_page = string(MAIN_page_beg) + val_table_mid.c_str() + string(MAIN_page_end);  
-
-
 
     request->send_P(200, "text/html", val_page.c_str());
   });
@@ -443,7 +467,7 @@ void ConnectWithAvailableWIfiNetwork()
         if(available[i])
         {
           Println("ssid:"+wifi[i][0]);
-          Println("pass:"+wifi[i][1]);
+          //Println("pass:"+wifi[i][1]);
           WiFi.begin(wifi[i][0].c_str(), wifi[i][1].c_str());
           int connectionTryCount=0;
           
@@ -497,10 +521,10 @@ void InitNormalMode()
   //xTaskCreatePinnedToCore(loop1, "FirstLoop", 10000, NULL, 0, &SecondLoop, xPortGetCoreID());          
 }
 
-
 void setup() {
 
-  DisplayInit();
+  DisplayInit(); //have to be first
+  
   LoadSetings();
 
   //setings_data.GetSeting("int_COM_BaudRate").data._int
