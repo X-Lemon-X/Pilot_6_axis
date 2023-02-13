@@ -211,7 +211,6 @@ namespace Setings
         }
     }
     
-
     void Setings::SaveSetingsToFlash()
     {
         setings_seting ss;

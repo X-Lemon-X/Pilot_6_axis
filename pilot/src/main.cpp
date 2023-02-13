@@ -196,6 +196,7 @@ void Println(String string)
   Serial.println(string);
 }
 
+
 void PrintSetings(Setings::Setings setings)
 {
   Println("Setings:");
@@ -233,6 +234,7 @@ void LoadSetings()
   #pragma region WIFI
 
   setings_data.AddSeting("str_host_wifi",string("192.168.1.1"));
+  setings_data.AddSeting("str_host_port",25000);
 
   setings_data.AddSeting("str_WIFI_1_S",string("ForeverWIFI"));
   setings_data.AddSeting("str_WIFI_1_P",string("6TTZQWQ67NR9"));
@@ -252,14 +254,13 @@ void LoadSetings()
   setings_data.AddSeting("str_WIFI_6_S",string(""));
   setings_data.AddSeting("str_WIFI_6_P",string(""));
 
-  setings_data.AddSeting("str_WIFI_7_S",string(""));
-  setings_data.AddSeting("str_WIFI_7_P",string(""));
+  //setings_data.AddSeting("str_WIFI_7_S",string(""));
+ // setings_data.AddSeting("str_WIFI_7_P",string(""));
 
-  setings_data.AddSeting("str_WIFI_8_S",string(""));
-  setings_data.AddSeting("str_WIFI_8_P",string(""));
-
-  setings_data.AddSeting("str_WIFI_9_S",string(""));
-  setings_data.AddSeting("str_WIFI_9_P",string(""));
+  //setings_data.AddSeting("str_WIFI_8_S",string(""));
+  //setings_data.AddSeting("str_WIFI_8_P",string(""));
+  //setings_data.AddSeting("str_WIFI_9_S",string(""));
+  //setings_data.AddSeting("str_WIFI_9_P",string(""));
   #pragma endregion
 
   setings_data.InitEPPROM();
