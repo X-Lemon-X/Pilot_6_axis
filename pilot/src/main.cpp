@@ -342,12 +342,12 @@ void DisplayInit()
   display.setTextSize(1);             
   display.setTextColor(SSD1306_WHITE);
   display.display();
-  oledPrint = new OledPrintLib(&display, DISPLAY_MAX_LINE_COUNT);
+  oledPrint = &OledPrintLib(&display, (int)DISPLAY_MAX_LINE_COUNT);
 
 }
 
-void PageNotFound(AsyncWebServerRequest *request) {
-  request->send(404, "text/plain", "Not found");
+void PageNotFound(AsyncWebServerRequest request) {
+  request.send(404, "text/plain", "Not found");
 }
 
 void InitAllWebEvents()

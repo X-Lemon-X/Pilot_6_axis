@@ -6,23 +6,29 @@
 #endif
 
 
-
 #ifdef OLEDPRINTLIB_H
 class OledPrintLib
 {
   private:
 
-  Adafruit_SSD1306 *display; 
+  Adafruit_SSD1306 *screen = NULL; 
   String *displayLines;
   int lineCount=0;
   int endLineIndex=0;
 
   void DislpayPrint(String line, bool pushLine, bool updateLine);
-  void DislpayPrint(String line[10]);
+  void DislpayPrint(String *line);
 
   public:
 
-  OledPrintLib(Adafruit_SSD1306 *display, int lineCount);
+  OledPrintLib(Adafruit_SSD1306 *screen, int lineCount)
+  {
+    this->screen = screen;
+    this->lineCount=lineCount;
+    String lines[lineCount];
+    this->displayLines = &lines[0];
+    this->endLineIndex = lineCount-1;
+  }
 
   void UpdateLine(String string, int line);
   void UpdateLine(String string);
