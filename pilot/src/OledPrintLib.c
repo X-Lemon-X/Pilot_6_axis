@@ -8,13 +8,6 @@
 #include <Adafruit_SSD1306.h>
 #include "OledPrintLib.h"
 
-#ifndef DEBB
-#define DEBB #ifdef DEBUG
-#endif
-
-#ifndef DEBE
-#define DEBE #endif
-#endif
 
   OledPrintLib::OledPrintLib(Adafruit_SSD1306 *display, int lineCount);
   {
