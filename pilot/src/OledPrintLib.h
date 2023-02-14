@@ -1,6 +1,10 @@
 
 //#include <string>
 
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+
 #ifndef OLEDPRINTLIB_H
 #define OLEDPRINTLIB_H
 #endif
@@ -21,19 +25,13 @@ class OledPrintLib
 
   public:
 
-  OledPrintLib(Adafruit_SSD1306 *screen, int lineCount)
-  {
-    this->screen = screen;
-    this->lineCount=lineCount;
-    String lines[lineCount];
-    this->displayLines = &lines[0];
-    this->endLineIndex = lineCount-1;
-  }
-
+  OledPrintLib(Adafruit_SSD1306 *screen, int lineCount);
+  ~OledPrintLib(){}
   void UpdateLine(String string, int line);
   void UpdateLine(String string);
   void Print(String string);
   void Println(String string);
 };
+
 
 #endif

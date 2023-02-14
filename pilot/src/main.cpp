@@ -29,6 +29,10 @@
 
 //for use of dual cores refere to https://randomnerdtutorials.com/esp32-dual-core-arduino-ide/
 
+
+//https://microcontrollerslab.com/esp32-esp8266-web-server-input-data-html-forms/
+
+
 //------------DEBUG
 
 #define DEBUG
@@ -75,8 +79,7 @@
 #define OLED_RESET 4
 
 #define DISPLAY_MAX_LINE_COUNT 7
-String displayLines[DISPLAY_MAX_LINE_COUNT];
-int lineCount=0;
+
 
 
 //-----------------------------WIFI_SETUP
@@ -88,7 +91,7 @@ uint8_t newMACAddress[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
 const char* ssid     = "Remote_Controler_4D";
 std::string WIFIpasssword="123456789";
 
-Adafruit_SSD1306 display = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+Adafruit_SSD1306 display;
 //WebServer server(80);
 AsyncWebServer server(80);
 
@@ -117,6 +120,9 @@ struct InputsData
   int btn_8 = 0;
 };
 
+
+#pragma region //Global Veriables
+
 IO_Control::FourAxisJoystick joystick1;
 IO_Control::FourAxisJoystick joystick2;
 InputsData inputs_main;
@@ -127,83 +133,14 @@ Setings::Setings setings_data;
 
 TaskHandle_t SecondLoop;
 
- //https://microcontrollerslab.com/esp32-esp8266-web-server-input-data-html-forms/
+#pragma endregion
+
 
 void ReadingInputs();
 void loop2(void * pvParameters);
 
-/*
-void DislpayPrint(String line, bool pushLine, bool updateLine)
-{
-  if(pushLine)
-  line = displayLines[DISPLAY_MAX_LINE_COUNT-1] + line;
-  else if(updateLine)
-    displayLines[DISPLAY_MAX_LINE_COUNT-1] = line;
-  else 
-    for(int i=1; i < DISPLAY_MAX_LINE_COUNT; i++) displayLines[i-1] = displayLines[i];
-  
-  displayLines[DISPLAY_MAX_LINE_COUNT-1] = line;
 
-  display.clearDisplay();
-  display.setCursor(0,0); 
-
-  for(int i=1; i < DISPLAY_MAX_LINE_COUNT; i++)
-  { 
-    display.setCursor(0,9*(i-1));
-    std::string str = displayLines[i].c_str();
-    str.resize(22);
-    display.print(String(str.c_str()));
-  }
-  display.display();
-}
-
-void DislpayPrint(String line[10])
-{
-  display.clearDisplay();
-  display.setCursor(0,0); 
-
-  for(int i=0; i < DISPLAY_MAX_LINE_COUNT; i++)
-  { 
-    display.setCursor(0,9*i);
-    std::string str = displayLines[i].c_str();
-    str.resize(22);
-    display.print(String(str.c_str()));
-  }
-  display.display();
-}
-
-void UpdateLine(String string, int line)
-{
-  if(line >= DISPLAY_MAX_LINE_COUNT) line = DISPLAY_MAX_LINE_COUNT-1;
-  else if (line < 0) line =0;
-
-  displayLines[line] = string;
-  DislpayPrint(displayLines);
-  Serial.println(string);
-}
-
-void UpdateLine(String string)
-{
-  UpdateLine(string,DISPLAY_MAX_LINE_COUNT-1);
-}
-
-void Print(String string)
-{
-  string = displayLines[DISPLAY_MAX_LINE_COUNT-1] + string;
-  displayLines[DISPLAY_MAX_LINE_COUNT-1] = string;
-  DislpayPrint(displayLines);
-  Serial.print(string);
-}
-
-void Println(String string)
-{
-  for(int i=1; i < DISPLAY_MAX_LINE_COUNT; i++) displayLines[i-1] = displayLines[i];
-  displayLines[DISPLAY_MAX_LINE_COUNT-1] = string;
-  DislpayPrint(displayLines);
-  Serial.println(string);
-}
-
-*/
+#pragma region //OledPrintLib shorted functions
 
 void Print(String string)
 {
@@ -238,127 +175,24 @@ void PrintSetings(Setings::Setings setings)
   }
 }
 
-void LoadSetings()
-{
+#pragma endregion
 
-  #pragma region Joysticks
-  setings_data.AddSeting("int_Joystick_left_MMin",-2048);
-  setings_data.AddSeting("int_Joystick_left_MMax",2048);
+#pragma region //WebSiteSetup site itp don't look  
 
-  setings_data.AddSeting("int_Joystick_right_MMin",-2048);
-  setings_data.AddSeting("int_Joystick_right_MMax",2048);
-
-  setings_data.AddSeting("int_Joystick_right_filer",0.95f);
-  setings_data.AddSeting("int_Joystick_left_filer",0.95f);
-
-  #pragma endregion
-
-  #pragma region Buttons
-
-  setings_data.AddSeting("bool_Btns_Mstable",string("0,0,0,0,0,0,0,0"));
-
-  #pragma endregion
-
-  #pragma region WIFI
-
-  setings_data.AddSeting("str_host_wifi",string("192.168.1.1"));
-  setings_data.AddSeting("str_host_port",25000);
-  setings_data.AddSeting("str_host_password",string("qwerty"));
-
-  setings_data.AddSeting("str_WIFI_1_S",string("ForeverWIFI"));
-  setings_data.AddSeting("str_WIFI_1_P",string("6TTZQWQ67NR9"));
-
-  setings_data.AddSeting("str_WIFI_2_S",string("400%mocy"));
-  setings_data.AddSeting("str_WIFI_2_P",string("qwerty987654321"));
-
-  setings_data.AddSeting("str_WIFI_3_S",string(""));
-  setings_data.AddSeting("str_WIFI_3_P",string(""));
-  
-  setings_data.AddSeting("str_WIFI_4_S",string(""));
-  setings_data.AddSeting("str_WIFI_4_P",string(""));
-
-  setings_data.AddSeting("str_WIFI_5_S",string(""));
-  setings_data.AddSeting("str_WIFI_5_P",string(""));
-
-  setings_data.AddSeting("str_WIFI_6_S",string(""));
-  setings_data.AddSeting("str_WIFI_6_P",string(""));
-
-  #pragma endregion
-
-  setings_data.InitEPPROM();
-  //setings_data.SaveSetingsToFlash();
-  setings_data.LoadSetingsFromFlash();
-}
-
-void GPIOinit()
-{
-  pinMode(PIN_MS_BTN_1, INPUT_PULLUP);
-  pinMode(PIN_MS_BTN_2, INPUT_PULLUP);
-  pinMode(PIN_MS_BTN_3, INPUT_PULLUP);
-  pinMode(PIN_MS_BTN_4, INPUT_PULLUP);
-  pinMode(PIN_MS_BTN_5, INPUT_PULLUP);
-  pinMode(PIN_MS_BTN_6, INPUT_PULLUP);
-  pinMode(PIN_MS_BTN_7, INPUT_PULLUP);
-  pinMode(PIN_MS_BTN_8, INPUT_PULLUP);
-
-  pinMode(PIN_BTN_JOYSTIK_1,INPUT_PULLUP);
-  pinMode(PIN_BTN_JOYSTIK_2,INPUT_PULLUP);
-
-  pinMode(PIN_X_ROT_JOYSTIK_1, INPUT);
-  pinMode(PIN_Y_ROT_JOYSTIK_1, INPUT);
-  pinMode(PIN_Z_ROT_JOYSTIK_1, INPUT);
-
-  pinMode(PIN_X_ROT_JOYSTIK_2, INPUT);
-  pinMode(PIN_Y_ROT_JOYSTIK_2, INPUT);
-  pinMode(PIN_Z_ROT_JOYSTIK_2, INPUT);
-
-  //joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1, 0.80f);
-  //joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2, 0.95f);
-  
-  joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1,
-    setings_data.GetSeting("int_Joystick_left_filer").data._float,
-    setings_data.GetSeting("int_Joystick_left_MMin").data._int,
-    setings_data.GetSeting("int_Joystick_left_MMax").data._int);
-
-  joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2,
-    setings_data.GetSeting("int_Joystick_right_filer").data._float,
-    setings_data.GetSeting("int_Joystick_right_MMin").data._int,
-    setings_data.GetSeting("int_Joystick_right_MMax").data._int);
-  
-  joystick1.AutoZero();
-  joystick2.AutoZero();
-}
-
-void DisplayInit()
-{
-  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
-  { 
-    Serial.println(F("SSD1306 allocation failed"));
-    exit(1);
-  }
-
-  display.display();
-  display.clearDisplay();
-  display.setTextSize(1);             
-  display.setTextColor(SSD1306_WHITE);
-  display.display();
-  oledPrint = &OledPrintLib(&display, (int)DISPLAY_MAX_LINE_COUNT);
-
-}
-
-void PageNotFound(AsyncWebServerRequest request) {
-  request.send(404, "text/plain", "Not found");
+void PageNotFound(AsyncWebServerRequest *request) {
+  request->send(404, "text/plain", "Not found");
 }
 
 void InitAllWebEvents()
 {
-  //WIFIpasssword = PassGenerator_GeneratePassword(WIFI_PASSWORD_LENGTH);
+  #ifndef DEBUG
+  WIFIpasssword = PassGenerator_GeneratePassword(WIFI_PASSWORD_LENGTH);
+  #endif
 
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, WIFIpasssword.c_str());
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    
     std::string val_table_mid = "";
     for (auto element = setings_data._setings.begin(); element!= setings_data._setings.end(); ++element)
     {
@@ -391,14 +225,6 @@ void InitAllWebEvents()
 
   server.onNotFound(PageNotFound);
   server.begin();
-}
-
-void InitSetupMode()
-{
-  InitAllWebEvents();
-  Println("--Setup mode--");
-  Println("http://192.168.4.1");
-  Println(WIFIpasssword.c_str());
 }
 
 bool FindWifiNetwork(String ssid, String *password, int *num)
@@ -492,6 +318,126 @@ void ConnectWithAvailableWIfiNetwork()
   }
 }
 
+#pragma endregion
+
+void LoadSetings()
+{
+
+  #pragma region Joysticks
+  setings_data.AddSeting("int_Joystick_left_MMin",-2048);
+  setings_data.AddSeting("int_Joystick_left_MMax",2048);
+
+  setings_data.AddSeting("int_Joystick_right_MMin",-2048);
+  setings_data.AddSeting("int_Joystick_right_MMax",2048);
+
+  setings_data.AddSeting("int_Joystick_right_filer",0.95f);
+  setings_data.AddSeting("int_Joystick_left_filer",0.95f);
+
+  #pragma endregion
+
+  #pragma region Buttons
+
+  setings_data.AddSeting("bool_Btns_Mstable",string("0,0,0,0,0,0,0,0"));
+
+  #pragma endregion
+
+  #pragma region WIFI
+
+  setings_data.AddSeting("str_host_wifi",string("192.168.1.1"));
+  setings_data.AddSeting("str_host_port",25000);
+  setings_data.AddSeting("str_host_password",string("qwerty"));
+
+  setings_data.AddSeting("str_WIFI_1_S",string("ForeverWIFI"));
+  setings_data.AddSeting("str_WIFI_1_P",string("6TTZQWQ67NR9"));
+
+  setings_data.AddSeting("str_WIFI_2_S",string("400%mocy"));
+  setings_data.AddSeting("str_WIFI_2_P",string("qwerty987654321"));
+
+  setings_data.AddSeting("str_WIFI_3_S",string(""));
+  setings_data.AddSeting("str_WIFI_3_P",string(""));
+  
+  setings_data.AddSeting("str_WIFI_4_S",string(""));
+  setings_data.AddSeting("str_WIFI_4_P",string(""));
+
+  setings_data.AddSeting("str_WIFI_5_S",string(""));
+  setings_data.AddSeting("str_WIFI_5_P",string(""));
+
+  setings_data.AddSeting("str_WIFI_6_S",string(""));
+  setings_data.AddSeting("str_WIFI_6_P",string(""));
+
+  #pragma endregion
+
+  setings_data.InitEPPROM();
+  //setings_data.SaveSetingsToFlash();
+  setings_data.LoadSetingsFromFlash();
+}
+
+void GPIOinit()
+{
+
+  pinMode(PIN_MS_BTN_1, INPUT_PULLUP);
+  pinMode(PIN_MS_BTN_2, INPUT_PULLUP);
+  pinMode(PIN_MS_BTN_3, INPUT_PULLUP);
+  pinMode(PIN_MS_BTN_4, INPUT_PULLUP);
+  pinMode(PIN_MS_BTN_5, INPUT_PULLUP);
+  pinMode(PIN_MS_BTN_6, INPUT_PULLUP);
+  pinMode(PIN_MS_BTN_7, INPUT_PULLUP);
+  pinMode(PIN_MS_BTN_8, INPUT_PULLUP);
+
+  pinMode(PIN_BTN_JOYSTIK_1,INPUT_PULLUP);
+  pinMode(PIN_BTN_JOYSTIK_2,INPUT_PULLUP);
+
+  pinMode(PIN_X_ROT_JOYSTIK_1, INPUT);
+  pinMode(PIN_Y_ROT_JOYSTIK_1, INPUT);
+  pinMode(PIN_Z_ROT_JOYSTIK_1, INPUT);
+
+  pinMode(PIN_X_ROT_JOYSTIK_2, INPUT);
+  pinMode(PIN_Y_ROT_JOYSTIK_2, INPUT);
+  pinMode(PIN_Z_ROT_JOYSTIK_2, INPUT);
+
+  //joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1, 0.80f);
+  //joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2, 0.95f);
+  
+  joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1,
+    setings_data.GetSeting("int_Joystick_left_filer").data._float,
+    setings_data.GetSeting("int_Joystick_left_MMin").data._int,
+    setings_data.GetSeting("int_Joystick_left_MMax").data._int);
+
+  joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2,
+    setings_data.GetSeting("int_Joystick_right_filer").data._float,
+    setings_data.GetSeting("int_Joystick_right_MMin").data._int,
+    setings_data.GetSeting("int_Joystick_right_MMax").data._int);
+  
+  joystick1.AutoZero();
+  joystick2.AutoZero();
+}
+
+void DisplayInit()
+{
+  display = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
+  { 
+    Serial.println(F("SSD1306 allocation failed"));
+    exit(1);
+  }
+
+  display.display();
+  display.clearDisplay();
+  display.setTextSize(1);             
+  display.setTextColor(SSD1306_WHITE);
+  display.display();
+  oledPrint = new OledPrintLib(&display,DISPLAY_MAX_LINE_COUNT);
+
+}
+
+void InitSetupMode()
+{
+  InitAllWebEvents();
+  Println("--Setup mode--");
+  Println("http://192.168.4.1");
+  Println(WIFIpasssword.c_str());
+}
+
 void InitNormalMode()
 {
   ConnectWithAvailableWIfiNetwork();
@@ -523,16 +469,12 @@ void InitNormalMode()
 
 void setup() {
 
-  DisplayInit(); //have to be first
-  
-  LoadSetings();
-
-  //setings_data.GetSeting("int_COM_BaudRate").data._int
   Serial.begin(115200);
+  DisplayInit(); //have to be first
+  LoadSetings(); //load setings
+  GPIOinit();
   PrintSetings(setings_data);
   
-  GPIOinit();
-
   if(!InOut::ReadInput(PIN_MS_BTN_4) || !InOut::ReadInput(PIN_MS_BTN_5)) InitSetupMode();
   else InitNormalMode();
 }
