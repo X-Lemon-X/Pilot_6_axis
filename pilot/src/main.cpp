@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "IO_Control.h"
-#include "OledMenu.h"
 #include "PassGenerator.h"
 #include "OledPrintLib.h"
 
@@ -37,8 +36,7 @@
 
 #define DEBUG
 
-#define DEBB #ifdef DEBUG
-#define DEBE #endif
+#define print(x) Serial.println(x);
 
 //-----------------------------INFO
 #define VERSION 1.3
@@ -95,7 +93,6 @@ Adafruit_SSD1306 display;
 //WebServer server(80);
 AsyncWebServer server(80);
 
-using namespace OledMenu;
 using namespace IO_Control;
 
 struct InputsData
@@ -130,14 +127,10 @@ OledPrintLib *oledPrint = NULL;
 
 Setings::Setings setings_data;
 
-
-TaskHandle_t SecondLoop;
-
 #pragma endregion
 
 
 void ReadingInputs();
-void loop2(void * pvParameters);
 
 
 #pragma region //OledPrintLib shorted functions
@@ -149,6 +142,10 @@ void Print(String string)
 
 void Println(String string)
 {
+  #ifdef DEBUG
+    Serial.println(string);
+    Serial.println((unsigned long)(oledPrint));
+  #endif
   oledPrint->Println(string);
 }
 
@@ -292,7 +289,7 @@ void ConnectWithAvailableWIfiNetwork()
         //Println("CH? num"  + String(i));
         if(available[i])
         {
-          Println("ssid:"+wifi[i][0]);
+          Println("ssid?:"+wifi[i][0]);
           //Println("pass:"+wifi[i][1]);
           WiFi.begin(wifi[i][0].c_str(), wifi[i][1].c_str());
           int connectionTryCount=0;
@@ -316,6 +313,20 @@ void ConnectWithAvailableWIfiNetwork()
     }
     delay(50);
   }
+}
+
+wl_status_t ReconnectWithWifiIfConenctionLost(wl_status_t prevStatus)
+{
+  wl_status_t status =  WiFi.status();
+  if(status!= prevStatus )
+  {
+    if(status != WL_CONNECTED)
+    { 
+      Println("disconnected");
+      ConnectWithAvailableWIfiNetwork();
+    }
+  }
+  return status;
 }
 
 #pragma endregion
@@ -410,14 +421,24 @@ void GPIOinit()
   
   joystick1.AutoZero();
   joystick2.AutoZero();
+
+  #ifdef DEBUG
+    print("GPIO initiated");
+  #endif
 }
 
 void DisplayInit()
 {
+  #ifdef DEBUG
+     print("Display ... new TerminalLike oled ...")
+  #endif
+
   display = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
   { 
-    Serial.println(F("SSD1306 allocation failed"));
+    #ifdef DEBUG
+    Serial.println("SSD1306 allocation failed");
+    #endif
     exit(1);
   }
 
@@ -426,7 +447,12 @@ void DisplayInit()
   display.setTextSize(1);             
   display.setTextColor(SSD1306_WHITE);
   display.display();
+
   oledPrint = new OledPrintLib(&display,DISPLAY_MAX_LINE_COUNT);
+
+  #ifdef DEBUG
+    print("Display Initiated new TerminalLike oled initiate");
+  #endif
 
 }
 
@@ -440,31 +466,14 @@ void InitSetupMode()
 
 void InitNormalMode()
 {
-  ConnectWithAvailableWIfiNetwork();
+  //ConnectWithAvailableWIfiNetwork();
 
- int core = xPortGetCoreID(); 
-  if(core == 1)
-    core = 0;
-  else
-    core = 1;
+  int core = xPortGetCoreID(); 
+  if(core == 1) core = 0;
+  else core = 1;
 
-   wl_status_t statusPrev=WL_IDLE_STATUS;
-  while(true)
-  {
-    wl_status_t status =  WiFi.status();
-    if(status!= statusPrev )
-    {
-      if(status != WL_CONNECTED)
-      { 
-        Println("disconnected");
-        ConnectWithAvailableWIfiNetwork();
-      }
-    }
-    statusPrev = status;
-  }
-
-  //xTaskCreatePinnedToCore(loop2, "SecondLoop", 10000, NULL, 1, &SecondLoop, core);        
-  //xTaskCreatePinnedToCore(loop1, "FirstLoop", 10000, NULL, 0, &SecondLoop, xPortGetCoreID());          
+  //xTaskCreatePinnedToCore(SecondLoopFunction, "second", 10000, NULL, 1, &SecondLoop, core);        
+  //xTaskCreatePinnedToCore(MainLoopFunction, "first", 10000, NULL, 0, &FirstLoop, xPortGetCoreID());          
 }
 
 void setup() {
@@ -473,22 +482,47 @@ void setup() {
   DisplayInit(); //have to be first
   LoadSetings(); //load setings
   GPIOinit();
+
+   
+  string *displayLines =  (string*)malloc(sizeof(string)*7);
+
+  for (size_t i = 0; i < 7; i++)
+  {
+    Serial.println((unsigned long)&displayLines[i]);
+    displayLines[i] = string("");
+  }
+
+
   PrintSetings(setings_data);
-  
+
   if(!InOut::ReadInput(PIN_MS_BTN_4) || !InOut::ReadInput(PIN_MS_BTN_5)) InitSetupMode();
   else InitNormalMode();
 }
 
-// Serialhandliing and wireless conections
-void loop() {
+void loop(){
+ 
 
 }
 
-// reding io and comunication hadler
-void loop2(void * pvParameters)
+//connection handler reconnectin handler
+void MainLoopFunction(void * pvParameters)
 {
- ReadingInputs();
+  wl_status_t statusPrev=WL_IDLE_STATUS;
+  while(true)
+  {
+    statusPrev = ReconnectWithWifiIfConenctionLost(statusPrev);
+  }
 }
+
+// reding io and updating output data
+void SecondLoopFunction(void * pvParameters)
+{
+  while(true)
+  {
+    ReadingInputs();
+  }
+}
+
 
 void ReadingInputs()
 {

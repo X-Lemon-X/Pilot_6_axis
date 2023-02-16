@@ -7,7 +7,8 @@ const char alphanum[] = "0123456789!@#$&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
 int string_length = sizeof(alphanum)-1;
 
 /*
-  Genarates password wih length of x
+  Genarates password wih length of x,
+   using symbols: "0123456789!@#$&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 */
 std::string PassGenerator_GeneratePassword(size_t x)
 {

@@ -1,3 +1,4 @@
+
 #include <string>
 #include <map>
 #include <Arduino.h>
@@ -6,11 +7,11 @@
 #include <Preferences.h>
 #define STRING_SIZE 35
 
+using namespace std;
+
 namespace Setings
 {
     
-    
-
     enum setings_ERRORS
     {
         ERRORS_OK=0,
