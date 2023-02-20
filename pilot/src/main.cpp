@@ -2,6 +2,7 @@
 #include "IO_Control.h"
 #include "PassGenerator.h"
 #include "OledPrintLib.h"
+#include "SendData.h"
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -12,44 +13,37 @@
 #include <WebServer.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-
 #include <esp_wifi.h>
-
-//#include <list>
 #include "esp32-hal-cpu.h"
 #include "SetingsPage.h"
 #include "Setings.h"
 
-
-
 //#include <EEPROM.h>   // https://randomnerdtutorials.com/esp32-flash-memory/
 //#include <Preferences.h>  // https://randomnerdtutorials.com/esp32-save-data-permanently-preferences/
 
-
 //for use of dual cores refere to https://randomnerdtutorials.com/esp32-dual-core-arduino-ide/
-
 
 //https://microcontrollerslab.com/esp32-esp8266-web-server-input-data-html-forms/
 
 
+
 //------------DEBUG
 
-#define DEBUG
+//#define DEBUG
 
 #define print(x) Serial.println(x);
 
 //-----------------------------INFO
-#define VERSION 1.3
-
+#define VERSION 1.4
 
 //-----------------------------JOYSTICKS PINOUT
-#define PIN_X_ROT_JOYSTIK_1 13
-#define PIN_Y_ROT_JOYSTIK_1 14
-#define PIN_Z_ROT_JOYSTIK_1 27
+#define PIN_X_ROT_JOYSTIK_1 36   // 13 -> adc1:36  VP
+#define PIN_Y_ROT_JOYSTIK_1 39   // 14 -> adc1:39  VN
+#define PIN_Z_ROT_JOYSTIK_1 34   // 27 -> adc1:34
 
-#define PIN_X_ROT_JOYSTIK_2 26
-#define PIN_Y_ROT_JOYSTIK_2 25
-#define PIN_Z_ROT_JOYSTIK_2 33
+#define PIN_X_ROT_JOYSTIK_2 35   // 26 -> adc1:35
+#define PIN_Y_ROT_JOYSTIK_2 32   // 25 -> adc1:32
+#define PIN_Z_ROT_JOYSTIK_2 33   // --  -> adc1:33
 
 #define PIN_BTN_JOYSTIK_1 4
 #define PIN_BTN_JOYSTIK_2 19
@@ -65,7 +59,6 @@
 #define PIN_MS_BTN_7 23
 #define PIN_MS_BTN_8 15
 
-
 //-----------------------------ADDITIONAL PINOUT
 #define PIN_BATTERY_VOLTAGE
 
@@ -77,21 +70,18 @@
 #define OLED_RESET 4
 
 #define DISPLAY_MAX_LINE_COUNT 7
-
-
+#define DISPLAY_MAX_CHARACTER_COUNT 21
 
 //-----------------------------WIFI_SETUP
 #define WIFI_SETINGS_BEG_NAME "str_WIFI_"
 #define WIFI_CONNECTION_TRY_MAX_COUNT 10
-#define WIFI_PASSWORD_LENGTH 15
+#define WIFI_PASSWORD_LENGTH 8
+#define TIME_BASE_DEFAULT 1000000 // us
+
 const char* WIFI_NAME = "remocon";
 uint8_t newMACAddress[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
 const char* ssid     = "Remote_Controler_4D";
 std::string WIFIpasssword="123456789";
-
-Adafruit_SSD1306 display;
-//WebServer server(80);
-AsyncWebServer server(80);
 
 using namespace IO_Control;
 
@@ -117,34 +107,47 @@ struct InputsData
   int btn_8 = 0;
 };
 
+#pragma region //Global Veriables | objects
 
-#pragma region //Global Veriables
-
+Adafruit_SSD1306 display;
+//WebServer server(80);
+AsyncWebServer *server;
 IO_Control::FourAxisJoystick joystick1;
 IO_Control::FourAxisJoystick joystick2;
 InputsData inputs_main;
 OledPrintLib *oledPrint = NULL;
-
+SendDataProtocol::Send_WIFI_UDP *sendUdp = NULL;
 Setings::Setings setings_data;
+
+TaskHandle_t FirstLoop;
+TaskHandle_t SecondLoop;
+
 
 #pragma endregion
 
+#pragma region // Function Declarations
 
 void ReadingInputs();
+void MainLoopFunction(void * pvParameters);
+void SecondLoopFunction(void * pvParameters);
+string ConvertInputDataToUdpMessage(InputsData inputs);
 
+#pragma endregion
 
 #pragma region //OledPrintLib shorted functions
 
 void Print(String string)
 {
+  #ifdef DEBUG
+    print(string);
+  #endif
   oledPrint->Print(string);
 }
 
 void Println(String string)
 {
   #ifdef DEBUG
-    Serial.println(string);
-    Serial.println((unsigned long)(oledPrint));
+    print(string);
   #endif
   oledPrint->Println(string);
 }
@@ -167,7 +170,7 @@ void PrintSetings(Setings::Setings setings)
   Println("");
   for(auto element=setings._setings.begin(); element != setings._setings.end(); element++ )
   {
-    UpdateLine(String(element->first.c_str()),5);
+    UpdateLine(String(element->first.c_str()),1);
     UpdateLine(PrintSeting(element->second));
   }
 }
@@ -186,10 +189,11 @@ void InitAllWebEvents()
   WIFIpasssword = PassGenerator_GeneratePassword(WIFI_PASSWORD_LENGTH);
   #endif
 
+  server = new AsyncWebServer(80);
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, WIFIpasssword.c_str());
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     std::string val_table_mid = "";
     for (auto element = setings_data._setings.begin(); element!= setings_data._setings.end(); ++element)
     {
@@ -202,7 +206,7 @@ void InitAllWebEvents()
   });
 
 
-  server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server->on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
     int errors_count=0; 
     for (size_t i = 0; i < request->params(); i++)
     {
@@ -220,8 +224,8 @@ void InitAllWebEvents()
   });
 
 
-  server.onNotFound(PageNotFound);
-  server.begin();
+  server->onNotFound(PageNotFound);
+  server->begin();
 }
 
 bool FindWifiNetwork(String ssid, String *password, int *num)
@@ -273,7 +277,7 @@ void ConnectWithAvailableWIfiNetwork()
       {        
         String passwd;
         String ssid= WiFi.SSID(count);
-        Println("CH? ssid:"+ssid);
+        Println("CH?:"+ssid);
         int num=0;
         if(FindWifiNetwork(ssid,&passwd,&num))
         {  
@@ -289,7 +293,7 @@ void ConnectWithAvailableWIfiNetwork()
         //Println("CH? num"  + String(i));
         if(available[i])
         {
-          Println("ssid?:"+wifi[i][0]);
+          Println("sd?:"+wifi[i][0]);
           //Println("pass:"+wifi[i][1]);
           WiFi.begin(wifi[i][0].c_str(), wifi[i][1].c_str());
           int connectionTryCount=0;
@@ -331,6 +335,8 @@ wl_status_t ReconnectWithWifiIfConenctionLost(wl_status_t prevStatus)
 
 #pragma endregion
 
+#pragma region //Initiating Microcontroler 
+
 void LoadSetings()
 {
 
@@ -354,8 +360,9 @@ void LoadSetings()
 
   #pragma region WIFI
 
-  setings_data.AddSeting("str_host_wifi",string("192.168.1.1"));
-  setings_data.AddSeting("str_host_port",25000);
+  setings_data.AddSeting("str_host_wifi",string("192.168.1.17"));
+  setings_data.AddSeting("int_host_port",25000);
+  setings_data.AddSeting("int_host_RefRate",1000);
   setings_data.AddSeting("str_host_password",string("qwerty"));
 
   setings_data.AddSeting("str_WIFI_1_S",string("ForeverWIFI"));
@@ -432,6 +439,7 @@ void DisplayInit()
   #ifdef DEBUG
      print("Display ... new TerminalLike oled ...")
   #endif
+  //Wire.setClock(100000);
 
   display = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
@@ -448,7 +456,7 @@ void DisplayInit()
   display.setTextColor(SSD1306_WHITE);
   display.display();
 
-  oledPrint = new OledPrintLib(&display,DISPLAY_MAX_LINE_COUNT);
+  oledPrint = new OledPrintLib(&display,DISPLAY_MAX_LINE_COUNT,DISPLAY_MAX_CHARACTER_COUNT);
 
   #ifdef DEBUG
     print("Display Initiated new TerminalLike oled initiate");
@@ -460,57 +468,73 @@ void InitSetupMode()
 {
   InitAllWebEvents();
   Println("--Setup mode--");
+  Println("sd:");
+  Print(String(ssid));
+  Println("pw:");
+  Print(String(WIFIpasssword.c_str()));
   Println("http://192.168.4.1");
-  Println(WIFIpasssword.c_str());
+  
 }
 
 void InitNormalMode()
 {
   //ConnectWithAvailableWIfiNetwork();
 
+  sendUdp = new SendDataProtocol::Send_WIFI_UDP(setings_data.GetSeting("str_host_wifi").data._string,setings_data.GetSeting("int_host_port").data._int);
+
+  #ifdef DEBUG
+    Println(setings_data.GetSeting("str_host_wifi").data._string);
+    Println(to_string(setings_data.GetSeting("int_host_port").data._int).c_str());
+    Println(sendUdp->GetIp().c_str());
+  #endif
+
   int core = xPortGetCoreID(); 
   if(core == 1) core = 0;
   else core = 1;
 
-  //xTaskCreatePinnedToCore(SecondLoopFunction, "second", 10000, NULL, 1, &SecondLoop, core);        
-  //xTaskCreatePinnedToCore(MainLoopFunction, "first", 10000, NULL, 0, &FirstLoop, xPortGetCoreID());          
+  MainLoopFunction(NULL);
+ // xTaskCreatePinnedToCore(SecondLoopFunction, "second", 10000, NULL, 1, &SecondLoop, core);        
+ // xTaskCreatePinnedToCore(MainLoopFunction, "first", 10000, NULL, 0, &FirstLoop, xPortGetCoreID());          
 }
+
+#pragma endregion
 
 void setup() {
 
   Serial.begin(115200);
   DisplayInit(); //have to be first
   LoadSetings(); //load setings
-  GPIOinit();
-
-   
-  string *displayLines =  (string*)malloc(sizeof(string)*7);
-
-  for (size_t i = 0; i < 7; i++)
-  {
-    Serial.println((unsigned long)&displayLines[i]);
-    displayLines[i] = string("");
-  }
-
-
+  GPIOinit(); //init GPIO
   PrintSetings(setings_data);
 
   if(!InOut::ReadInput(PIN_MS_BTN_4) || !InOut::ReadInput(PIN_MS_BTN_5)) InitSetupMode();
   else InitNormalMode();
 }
 
-void loop(){
- 
+void loop(){}
 
-}
-
-//connection handler reconnectin handler
+//connection handler reconnectin handler reading input
 void MainLoopFunction(void * pvParameters)
 {
   wl_status_t statusPrev=WL_IDLE_STATUS;
+  unsigned long timerMicrosSendData=0;
+  unsigned long dalayMicros = (unsigned long)setings_data.GetSeting("int_host_RefRate").data._int;
+  dalayMicros = TIME_BASE_DEFAULT/dalayMicros;  
+
   while(true)
   {
     statusPrev = ReconnectWithWifiIfConenctionLost(statusPrev);
+    ReadingInputs();
+
+    if(micros() - timerMicrosSendData > dalayMicros)
+    {
+      timerMicrosSendData = micros();
+      sendUdp->SendData(ConvertInputDataToUdpMessage(inputs_main));
+    } 
+
+    #ifdef DEBUG
+      delay(10);
+    #endif
   }
 }
 
@@ -522,7 +546,6 @@ void SecondLoopFunction(void * pvParameters)
     ReadingInputs();
   }
 }
-
 
 void ReadingInputs()
 {
@@ -546,4 +569,28 @@ void ReadingInputs()
   inputs_main.btn_8 = InOut::ReadInput(PIN_MS_BTN_8);
 }
 
+string ConvertInputDataToUdpMessage(InputsData inputs)
+{
+  string buffor="#";
+  buffor += ":X1 " + to_string(inputs.joystick_1_x);
+  buffor += ":Y1 " + to_string(inputs.joystick_1_y);
+  buffor += ":Z1 " + to_string(inputs.joystick_1_z);
+  buffor += ":B1 " + to_string(inputs.joystick_1_btn);
+
+  buffor += ":X2 " + to_string(inputs.joystick_2_x);
+  buffor += ":Y2 " + to_string(inputs.joystick_2_y);
+  buffor += ":Z2 " + to_string(inputs.joystick_2_z);
+  buffor += ":B2 " + to_string(inputs.joystick_2_btn);
+
+  buffor += ":H1 " + to_string(inputs.btn_1);
+  buffor += ":H2 " + to_string(inputs.btn_2);
+  buffor += ":H3 " + to_string(inputs.btn_3);
+  buffor += ":H4 " + to_string(inputs.btn_4);
+  buffor += ":H5 " + to_string(inputs.btn_5);
+  buffor += ":H6 " + to_string(inputs.btn_6);
+  buffor += ":H7 " + to_string(inputs.btn_7);
+  buffor += ":H8 " + to_string(inputs.btn_8);
+  buffor += ":@";
+  return buffor;
+}
 

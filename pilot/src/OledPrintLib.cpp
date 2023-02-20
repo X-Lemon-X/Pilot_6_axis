@@ -25,55 +25,14 @@
     #endif
   }
 
-  void OledPrintLib::DislpayPrint(String line, bool pushLine, bool updateLine)
-  {
-    if(pushLine) line = displayLines[endLineIndex] + line;
-    else if(updateLine)
-    {
-      displayLines[endLineIndex] = line;
-      this->bufforStrings.insert(this->bufforStrings.end(),line);
-    }
-    else {
-      for(int i=1; i < this->lineCount; i++) displayLines[i-1] = displayLines[i];
-
-      this->bufforStrings.push_back(line);
-      if(this->bufforStrings.size() >= this->lineCount) this->bufforStrings.erase(this->bufforStrings.begin());
-      
-    }
-    displayLines[endLineIndex] = line;
-
-    screen->clearDisplay();
-    screen->setCursor(0,0); 
-
-    for(int i=1; i < this->lineCount; i++)
-    { 
-      screen->setCursor(0,9*(i-1));
-      std::string str = displayLines[i].c_str();
-      str.resize(22);
-      screen->print(String(str.c_str()));
-    }
-    screen->display();
-  }
-
   void OledPrintLib::DislpayPrint()
   {
     screen->clearDisplay();
-    screen->setCursor(0,0); 
-
     int i =0;
-    for (auto element = this->bufforStrings.begin(); element != this->bufforStrings.end(); element++;)
+    for (auto element = this->bufforStrings.begin(); element != this->bufforStrings.end(); element++)
     {
       screen->setCursor(0,9*(i++));
       std::string str =  element->c_str();
-      str.resize(this->charactersMaxContWidth);
-      screen->print(String(str.c_str()));
-    }
-    
-
-    for(int i=0; i < this->lineCount; i++)
-    { 
-      screen->setCursor(0,9*i);
-      std::string str = displayLines[i].c_str();
       str.resize(this->charactersMaxContWidth);
       screen->print(String(str.c_str()));
     }
@@ -84,35 +43,25 @@
   {
     if(line >= this->lineCount) line = this->endLineIndex;
     else if (line < 0) line =0;
-
-    displayLines[line] = string;
-    DislpayPrint(displayLines);
-
-
-    #ifdef DEBUG
-      Serial.println(string);
-    #endif
+    this->bufforStrings[this->lineCount-line] = string;
+    DislpayPrint();
   }
 
   void OledPrintLib::UpdateLine(String string)
   {
-    UpdateLine(string,endLineIndex);
+    UpdateLine(string,0);
   }
 
-  void OledPrintLib::Print(String string)
+  void OledPrintLib::Print(String line)
   {
-    string = displayLines[endLineIndex] + string;
-    displayLines[this->lineCount-1] = string;
-    DislpayPrint(displayLines);
-
-    #ifdef DEBUG
-    Serial.print(string);
-    #endif
+    line = this->bufforStrings[endLineIndex] + line;   
+    this->bufforStrings[endLineIndex] = line;
+    DislpayPrint();
   }
 
-  void OledPrintLib::Println(String string)
-  {
-    for(int i=1; i < this->lineCount; i++) displayLines[i-1] = displayLines[i];
-    displayLines[this->lineCount-1] = string;
-    DislpayPrint(displayLines);
+  void OledPrintLib::Println(String line)
+  { 
+    this->bufforStrings.push_back(line);
+    if(this->bufforStrings.size() >= this->lineCount) this->bufforStrings.erase(this->bufforStrings.begin());
+    DislpayPrint();
   }

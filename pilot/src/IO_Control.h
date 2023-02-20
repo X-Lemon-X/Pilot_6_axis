@@ -1,5 +1,6 @@
 // IO_Control.h
 
+#include <Arduino.h>
 
 #ifndef IO_CONTROL_H
 #define IO_CONTROL_H
@@ -70,6 +71,62 @@ namespace IO_Control
       
       static int ReadInput(int pin);
       static int GetAvarageAnalog(int pin, int count);
+
+  };
+
+  class InputGPIO: public InOut
+  {
+    private:
+      bool prevState=false;
+      bool lachRL=false;
+      bool inverse=false;
+      float prevValue=0;
+      float dumping=1;
+      float dumpingRevers=0;
+      int GPIOnumber=0;
+      int type;
+    public:
+      #define SET_AS_INPUT 1
+      #define INVERSE_INPUT true
+      #define DONT_INVERSE_INPUT false
+
+      InputGPIO(int pin, int type = SET_AS_INPUT, bool inverseInput = DONT_INVERSE_INPUT )
+      {
+        this->GPIOnumber = pin;
+        this->type = type;
+        this->inverse = inverseInput;
+      }
+
+      void SetDumping(float dumping)
+      {
+        this->dumping = dumping;
+        this->dumpingRevers = 1.0f - dumping;
+      }
+
+      bool ReadWithLach()
+      {
+        bool state = ReadDigital();
+        if(state != prevState && state == false)
+        { 
+          lachRL = !lachRL;
+        }
+        prevState = state;
+        return lachRL;
+      }
+
+      bool ReadDigital()
+      {
+        bool state = (bool)ReadInput(this->GPIOnumber);
+        return inverse? !state : state;
+      }
+
+      int ReadAnalogWithDumping()
+      {
+        float value = (float)analogRead(this->GPIOnumber);
+        value = (value * this->dumping) + (prevValue * dumpingRevers);
+        prevValue = value;
+        return (int)value;
+      }
 
   };
 }

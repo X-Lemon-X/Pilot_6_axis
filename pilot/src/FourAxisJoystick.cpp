@@ -35,6 +35,7 @@ using namespace IO_Control;
     this->pinBtn = pinBtn;
     this->map_max = maping_max;
     this->map_min = maping_min;
+    this->map_middle = (maping_max + maping_min) / 2; 
     
     resolutionSet(resolution);
   }
@@ -107,8 +108,7 @@ using namespace IO_Control;
       return map((int)value, RESOLUTION/2, RESOLUTION - offset, map_middle, map_max);
     else
       return map((int)value, - offset, RESOLUTION/2, map_min, map_middle);
-    
-    //return map((int)value, 0, RESOLUTION , map_min, map_max);
+
   }
   
   int FourAxisJoystick::readBtn()

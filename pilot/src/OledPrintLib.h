@@ -10,32 +10,28 @@
 #endif
 
 
-#define DEBUG
+//#define DEBUG
 
 
 
 #ifdef OLEDPRINTLIB_H
-
-#define LINE_COUNT 7
 
 class OledPrintLib
 {
   private:
 
   Adafruit_SSD1306 *screen = NULL; 
-  String displayLines[LINE_COUNT];
   std::vector<String> bufforStrings; 
 
   int lineCount=0;
   int endLineIndex=0;
   int charactersMaxContWidth=0;
 
-  void DislpayPrint(String line, bool pushLine, bool updateLine);
-  void DislpayPrint(String *line);
+  void DislpayPrint();
 
   public:
 
-  OledPrintLib(Adafruit_SSD1306 *screen, int lineCount);
+  OledPrintLib(Adafruit_SSD1306 *screen, int lineCount, int charactersMaxContWidth);
   ~OledPrintLib(){}
   void UpdateLine(String string, int line);
   void UpdateLine(String string);
