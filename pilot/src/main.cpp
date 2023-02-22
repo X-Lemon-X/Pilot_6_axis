@@ -130,7 +130,7 @@ TaskHandle_t SecondLoop;
 void ReadingInputs();
 void MainLoopFunction(void * pvParameters);
 void SecondLoopFunction(void * pvParameters);
-string ConvertInputDataToUdpMessage(InputsData inputs);
+string ConvertInputDataToMessage(InputsData inputs);
 
 #pragma endregion
 
@@ -529,7 +529,7 @@ void MainLoopFunction(void * pvParameters)
     if(micros() - timerMicrosSendData > dalayMicros)
     {
       timerMicrosSendData = micros();
-      sendUdp->SendData(ConvertInputDataToUdpMessage(inputs_main));
+      sendUdp->SendData(ConvertInputDataToMessage(inputs_main));
     } 
 
     #ifdef DEBUG
@@ -569,7 +569,7 @@ void ReadingInputs()
   inputs_main.btn_8 = InOut::ReadInput(PIN_MS_BTN_8);
 }
 
-string ConvertInputDataToUdpMessage(InputsData inputs)
+string ConvertInputDataToMessage(InputsData inputs)
 {
   string buffor="#";
   buffor += ":X1 " + to_string(inputs.joystick_1_x);

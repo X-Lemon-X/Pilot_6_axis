@@ -1,4 +1,5 @@
 import socket
+import time
 
 
 class RemoteControler:
@@ -92,6 +93,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # Bind the socket to the host and port
 s.bind((HOST, PORT))
 rd= RemoteControler()
+beg = time.time()
 
 try:
     while True:
@@ -103,7 +105,8 @@ try:
         if data:
             #decode Data using RemoteControler class
             rd.DecodeData(data[0])
-            print(rd)
+            diff = time.time() - beg
+            print("time: " + str(diff) + "[s] -> " + str(round(diff/60,1)) + "[m] " + str(rd))
 
 except:
     s.close()
