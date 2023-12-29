@@ -1,6 +1,7 @@
 #include <string>
 #include <map>
 #include <Arduino.h>
+#include <string>
 
 #include <EEPROM.h> // https://randomnerdtutorials.com/esp32-flash-memory/
 #include <Preferences.h>
@@ -45,7 +46,7 @@ namespace Setings
     void InitEPPROM();
     void LoadSetingsFromFlash();
     void SaveSetingsToFlash();
-    std::map<string, setings_seting> _setings;
+    std::map<std::string, setings_seting> _setings;
 
     setings_seting GetSeting(std::string name);
     void AddSeting(std::string name, int seting);
@@ -103,7 +104,7 @@ namespace Setings
     setings_seting ss;
     ss.type = _int;
     ss.data._int = seting;
-    _setings.insert(std::pair<string, setings_seting>(name, ss));
+    _setings.insert(std::pair<std::string, setings_seting>(name, ss));
 
     auto iterator = _setings.begin();
   }
@@ -113,7 +114,7 @@ namespace Setings
     setings_seting ss;
     ss.type = _bool;
     ss.data._bool = seting;
-    _setings.insert(std::pair<string, setings_seting>(name, ss));
+    _setings.insert(std::pair<std::string, setings_seting>(name, ss));
   }
 
   void Setings::AddSeting(std::string name, float seting)
@@ -121,7 +122,7 @@ namespace Setings
     setings_seting ss;
     ss.type = _float;
     ss.data._float = seting;
-    _setings.insert(std::pair<string, setings_seting>(name, ss));
+    _setings.insert(std::pair<std::string, setings_seting>(name, ss));
   }
 
   void Setings::AddSeting(std::string name, std::string seting)
@@ -130,7 +131,7 @@ namespace Setings
     ss.type = _string;
     seting.resize(STRING_SIZE);
     strcpy(ss.data._string, seting.c_str());
-    _setings.insert(std::pair<string, setings_seting>(name, ss));
+    _setings.insert(std::pair<std::string, setings_seting>(name, ss));
   }
 
   int Setings::UpdateSeting(std::string name, std::string input_data)
