@@ -53,5 +53,6 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp"
-    }
+    },
+    "stm32-for-vscode.openOCDPath": false
 }

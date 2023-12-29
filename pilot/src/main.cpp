@@ -2,6 +2,8 @@
 #include "IO_Control.h"
 #include "OledMenu.h"
 #include "PassGenerator.h"
+#include <string>
+#include <iomanip>
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -9,6 +11,7 @@
 
 #include <WiFi.h>
 #include <WiFiClient.h>
+#include <WiFiUdp.h>
 #include <WebServer.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -28,34 +31,38 @@
 
 //for use of dual cores refere to https://randomnerdtutorials.com/esp32-dual-core-arduino-ide/
 
+//----------------------IMPORTANT----BUILDING
+
+// #define SAVE_TO_FLASH  // only use once to save new setings to flash -> Flush ESP32 with it uncomented then Flush again without it //newer work with it uncommented or it will break EPPROM 
+
 
 //-----------------------------INFO
-#define VERSION 1.2
+#define VERSION 1.4
 
 
 
 //-----------------------------JOYSTICKS PINOUT
-#define PIN_X_ROT_JOYSTIK_1 13
-#define PIN_Y_ROT_JOYSTIK_1 14
-#define PIN_Z_ROT_JOYSTIK_1 27
+#define PIN_X_ROT_JOYSTIK_1 33
+#define PIN_Y_ROT_JOYSTIK_1 32
+#define PIN_Z_ROT_JOYSTIK_1 35
 
-#define PIN_X_ROT_JOYSTIK_2 26
-#define PIN_Y_ROT_JOYSTIK_2 25
-#define PIN_Z_ROT_JOYSTIK_2 33
+#define PIN_X_ROT_JOYSTIK_2 34
+#define PIN_Y_ROT_JOYSTIK_2 39
+#define PIN_Z_ROT_JOYSTIK_2 36
 
-#define PIN_BTN_JOYSTIK_1 4
-#define PIN_BTN_JOYSTIK_2 19
+#define PIN_BTN_JOYSTIK_1 19
+#define PIN_BTN_JOYSTIK_2 23
 
 
 //-----------------------------BTNs PINOUT
-#define PIN_MS_BTN_1 2
-#define PIN_MS_BTN_2 0
-#define PIN_MS_BTN_3 16
-#define PIN_MS_BTN_4 17
-#define PIN_MS_BTN_5 5
-#define PIN_MS_BTN_6 18
-#define PIN_MS_BTN_7 23
-#define PIN_MS_BTN_8 15
+#define PIN_MS_BTN_1 15
+#define PIN_MS_BTN_2 2
+#define PIN_MS_BTN_3 0
+#define PIN_MS_BTN_4 4
+#define PIN_MS_BTN_5 16
+#define PIN_MS_BTN_6 17
+#define PIN_MS_BTN_7 5
+#define PIN_MS_BTN_8 18
 
 
 //-----------------------------ADDITIONAL PINOUT
@@ -66,7 +73,7 @@
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define SCREEN_ADDRESS 0x3C
 #define WIRE Wire
-#define OLED_RESET 4
+#define OLED_RESET -1 //4
 
 #define DISPLAY_MAX_LINE_COUNT 7
 String displayLines[DISPLAY_MAX_LINE_COUNT];
@@ -78,13 +85,23 @@ int lineCount=0;
 #define WIFI_CONNECTION_TRY_MAX_COUNT 10
 #define WIFI_PASSWORD_LENGTH 15
 const char* WIFI_NAME = "remocon";
-uint8_t newMACAddress[] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA};
-const char* ssid     = "Remote_Controler_4D";
+uint8_t newMACAddress[] = {0xA0, 0x46, 0x2A, 0x7A, 0x68, 0x36}; //A0-46-2A-7A-68-36
+const char* ssid     = "RC_4D";
 std::string WIFIpasssword="123456789";
+
+//-----------------------------UDP
+#define UDP_BEGIN "$RC:"
+#define UDP_END "#\r"
+#define UDP_FIXED_SIZE 5
 
 Adafruit_SSD1306 display = Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 //WebServer server(80);
 AsyncWebServer server(80);
+
+//-----------------------------SETINGS
+
+#define RC_MODE_NORMAL 0
+#define RC_MODE_SETUP 1
 
 using namespace OledMenu;
 using namespace IO_Control;
@@ -117,14 +134,19 @@ InputsData inputs_main;
 
 Setings::Setings setings_data;
 
-
+uint8_t RC_Mode = RC_MODE_NORMAL;
+bool Wifi_Connected = false;
 TaskHandle_t SecondLoop;
 
  //https://microcontrollerslab.com/esp32-esp8266-web-server-input-data-html-forms/
 
-void ReadingInputs();
-void loop2(void * pvParameters);
+// void ReadingInputs();
+void Task_ReadingInputs(void *param);
+void Task_Conenct_to_Wifi(void *param);
+void Task_SendUDP_data(void *param);
+// void loop2(void * pvParameters);
 
+#pragma region Display
 
 void DislpayPrint(String line, bool pushLine, bool updateLine)
 {
@@ -165,6 +187,12 @@ void DislpayPrint(String line[10])
   display.display();
 }
 
+void DisplayClear()
+{
+  for(int i=0; i < DISPLAY_MAX_LINE_COUNT; i++) displayLines[i] = "";
+  DislpayPrint(displayLines);
+}
+
 void UpdateLine(String string, int line)
 {
   if(line >= DISPLAY_MAX_LINE_COUNT) line = DISPLAY_MAX_LINE_COUNT-1;
@@ -196,6 +224,8 @@ void Println(String string)
   Serial.println(string);
 }
 
+#pragma endregion
+
 
 void PrintSetings(Setings::Setings setings)
 {
@@ -208,6 +238,14 @@ void PrintSetings(Setings::Setings setings)
     UpdateLine(String(element->first.c_str()),5);
     UpdateLine(PrintSeting(element->second));
   }
+}
+
+void PrintInfo()
+{
+  DisplayClear();
+  Println("Remote Controler 6D");
+  Println("ver: "+ String(VERSION));
+  delay(1000);
 }
 
 void LoadSetings()
@@ -227,17 +265,19 @@ void LoadSetings()
 
   #pragma region Buttons
 
-  setings_data.AddSeting("bool_Btns_Mstable",string("0,0,0,0,0,0,0,0"));
+  //setings_data.AddSeting("bool_Btns_Mstable",string("0,0,0,0,0,0,0,0"));
 
   #pragma endregion
 
   #pragma region WIFI
 
-  setings_data.AddSeting("str_host_wifi",string("192.168.1.1"));
+  setings_data.AddSeting("str_host_wifi",string("192.168.1.210"));
   setings_data.AddSeting("str_host_port",25000);
 
-  setings_data.AddSeting("str_WIFI_1_S",string("ForeverWIFI"));
-  setings_data.AddSeting("str_WIFI_1_P",string("6TTZQWQ67NR9"));
+  setings_data.AddSeting("int_upd_freq",40);
+
+  setings_data.AddSeting("str_WIFI_1_S",string("ForeverWIFIv2_2.4"));
+  setings_data.AddSeting("str_WIFI_1_P",string("jmnseroj0ity43"));
 
   setings_data.AddSeting("str_WIFI_2_S",string("400%mocy"));
   setings_data.AddSeting("str_WIFI_2_P",string("qwerty987654321"));
@@ -264,7 +304,9 @@ void LoadSetings()
   #pragma endregion
 
   setings_data.InitEPPROM();
-  //setings_data.SaveSetingsToFlash();
+  #ifdef SAVE_TO_FLASH
+    setings_data.SaveSetingsToFlash();
+  #endif
   setings_data.LoadSetingsFromFlash();
 }
 
@@ -319,7 +361,11 @@ void DisplayInit()
   display.setTextSize(1);             
   display.setTextColor(SSD1306_WHITE);
   display.display();
+  Serial.println("SSD1306 allocation success");
+  
 }
+
+#pragma region WEB PAGES
 
 void PageNotFound(AsyncWebServerRequest *request) {
   request->send(404, "text/plain", "Not found");
@@ -370,13 +416,7 @@ void InitAllWebEvents()
   server.begin();
 }
 
-void InitSetupMode()
-{
-  InitAllWebEvents();
-  Println("--Setup mode--");
-  Println("http://192.168.4.1");
-  Println(WIFIpasssword.c_str());
-}
+#pragma endregion
 
 bool FindWifiNetwork(String ssid, String *password, int *num)
 {
@@ -401,7 +441,7 @@ bool FindWifiNetwork(String ssid, String *password, int *num)
   return false;
 }
 
-void ConnectWithAvailableWIfiNetwork()
+bool ConnectWithAvailableWIfiNetwork()
 {
   WiFi.mode(WIFI_STA);
   esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
@@ -421,130 +461,194 @@ void ConnectWithAvailableWIfiNetwork()
   while (notConnected)
   {
     int i = WiFi.scanNetworks();
-    if(i>0)
-    {
-      for (int count = 0; count < i; count++)
-      {        
-        String passwd;
-        String ssid= WiFi.SSID(count);
-        Println("CH? ssid:"+ssid);
-        int num=0;
-        if(FindWifiNetwork(ssid,&passwd,&num))
-        {  
-          Println("Available");
-          available[num]= true;
-          wifi[num][0] = ssid;
-          wifi[num][1] = passwd;
-        }
-      } 
+    if(i<=0){
+      delay(50);
+      continue;
+    }
+  
+    for (int count = 0; count < i; count++)
+    {        
+      String passwd;
+      String ssid= WiFi.SSID(count);
+      Println("CH? ssid:"+ssid);
+      int num=0;
+      if(FindWifiNetwork(ssid,&passwd,&num))
+      {  
+        Println("Available");
+        available[num]= true;
+        wifi[num][0] = ssid;
+        wifi[num][1] = passwd;
+      }
+    } 
 
-      for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 10; i++)
+    {
+      //Println("CH? num"  + String(i));
+      if(available[i])
       {
-        //Println("CH? num"  + String(i));
-        if(available[i])
-        {
-          Println("ssid:"+wifi[i][0]);
-          Println("pass:"+wifi[i][1]);
-          WiFi.begin(wifi[i][0].c_str(), wifi[i][1].c_str());
-          int connectionTryCount=0;
-          
-          Println("");
-          while (WiFi.status() != WL_CONNECTED) {
-            Print(".");
-            delay(100);
-            if(WIFI_CONNECTION_TRY_MAX_COUNT == connectionTryCount++) break;
-          }
-          
-          if(WiFi.status() == WL_CONNECTED){
-            Println("Connected to:");
-            Println(wifi[i][0]);
-            Println(WiFi.localIP().toString());
-            notConnected = false;
-            break;
-          }
+        Println("ssid:"+wifi[i][0]);
+        Println("pass:"+wifi[i][1]);
+        WiFi.begin(wifi[i][0].c_str(), wifi[i][1].c_str());
+        int connectionTryCount=0;
+        
+        Println("");
+        while (WiFi.status() != WL_CONNECTED) {
+          Print(".");
+          delay(100);
+          if(WIFI_CONNECTION_TRY_MAX_COUNT == connectionTryCount++) break;
+        }
+        
+        if(WiFi.status() == WL_CONNECTED){
+          Println("Connected to:");
+          Println(wifi[i][0]);
+          Println(WiFi.localIP().toString());
+          notConnected = false;
+          break;
         }
       }
     }
-    delay(50);
+  
+    
   }
+  return !notConnected;
+}
+
+void WaitForConnection(){
+  wl_status_t statusPrev=WL_IDLE_STATUS;
+  while(true){
+    wl_status_t status =  WiFi.status();
+    if(status!= statusPrev ){
+      if(status != WL_CONNECTED){ 
+        Println("disconnected");
+        Wifi_Connected = ConnectWithAvailableWIfiNetwork();
+      }
+
+    }
+    statusPrev = status;
+  }
+}
+
+void InitSetupMode()
+{
+  InitAllWebEvents();
+  Println("--Setup mode--");
+  Println("http://192.168.4.1");
+  Println(WIFIpasssword.c_str());
 }
 
 void InitNormalMode()
 {
-  ConnectWithAvailableWIfiNetwork();
-
- int core = xPortGetCoreID(); 
-  if(core == 1)
-    core = 0;
-  else
-    core = 1;
-
-   wl_status_t statusPrev=WL_IDLE_STATUS;
-  while(true)
-  {
-    wl_status_t status =  WiFi.status();
-    if(status!= statusPrev )
-    {
-      if(status != WL_CONNECTED)
-      { 
-        Println("disconnected");
-        ConnectWithAvailableWIfiNetwork();
-      }
-    }
-    statusPrev = status;
-  }
-
-  //xTaskCreatePinnedToCore(loop2, "SecondLoop", 10000, NULL, 1, &SecondLoop, core);        
-  //xTaskCreatePinnedToCore(loop1, "FirstLoop", 10000, NULL, 0, &SecondLoop, xPortGetCoreID());          
+  xTaskCreate(Task_ReadingInputs,"Tread",2000, NULL, 3,NULL);
+  xTaskCreate(Task_Conenct_to_Wifi,"Twifi",3000, NULL, 3,NULL);
+  xTaskCreate(Task_SendUDP_data,"Tudp",3000, NULL, 3,NULL);
 }
 
 
 void setup() {
 
-  DisplayInit();
-  LoadSetings();
-
-  //setings_data.GetSeting("int_COM_BaudRate").data._int
   Serial.begin(115200);
+  DisplayInit();
+  PrintInfo();
+  LoadSetings();
   PrintSetings(setings_data);
-  
   GPIOinit();
 
-  if(!InOut::ReadInput(PIN_MS_BTN_4) || !InOut::ReadInput(PIN_MS_BTN_5)) InitSetupMode();
-  else InitNormalMode();
+  if(!InOut::ReadInput(PIN_MS_BTN_4) || !InOut::ReadInput(PIN_MS_BTN_5)){
+    RC_Mode = RC_MODE_SETUP;
+    InitSetupMode();
+  }
+  else{
+    RC_Mode = RC_MODE_NORMAL;
+    InitNormalMode();
+  }
 }
 
-// Serialhandliing and wireless conections
 void loop() {
-
+vTaskDelay(1000);
 }
 
-// reding io and comunication hadler
-void loop2(void * pvParameters)
+String fixString(int value, int size)
 {
- ReadingInputs();
+  String str = String(value);
+  if(str.length() >= size) return str;
+  std::string adons="";
+  adons.resize(size-str.length(),' ');
+  return String(adons.c_str()) + str;
 }
 
-void ReadingInputs()
+void Task_SendUDP_data(void *param)
 {
-  inputs_main.joystick_1_x = joystick1.readX();
-  inputs_main.joystick_1_y = joystick1.readY();
-  inputs_main.joystick_1_z = joystick1.readZ();
-  inputs_main.joystick_1_btn = joystick1.readBtn();
+  WiFiUDP udp;
+  IPAddress remoteIP;
+  remoteIP.fromString(setings_data.GetSeting("str_host_wifi").data._string);
 
-  inputs_main.joystick_2_x = joystick2.readX();
-  inputs_main.joystick_2_y = joystick2.readY();
-  inputs_main.joystick_2_z = joystick2.readZ();
-  inputs_main.joystick_2_btn = joystick2.readBtn();
+  unsigned int remotePort = setings_data.GetSeting("str_host_port").data._int;;
+  float send_delay =  1000.0 / (float)setings_data.GetSeting("int_upd_freq").data._int;
 
-  inputs_main.btn_1 = InOut::ReadInput(PIN_MS_BTN_1);
-  inputs_main.btn_2 = InOut::ReadInput(PIN_MS_BTN_2);
-  inputs_main.btn_3 = InOut::ReadInput(PIN_MS_BTN_3);
-  inputs_main.btn_4 = InOut::ReadInput(PIN_MS_BTN_4);
-  inputs_main.btn_5 = InOut::ReadInput(PIN_MS_BTN_5);
-  inputs_main.btn_6 = InOut::ReadInput(PIN_MS_BTN_6);
-  inputs_main.btn_7 = InOut::ReadInput(PIN_MS_BTN_7);
-  inputs_main.btn_8 = InOut::ReadInput(PIN_MS_BTN_8);
+  while(1){
+    String data = UDP_BEGIN +
+      fixString(inputs_main.joystick_1_x,5)+ ":"+
+      fixString(inputs_main.joystick_1_y,5)+ ":"+
+      fixString(inputs_main.joystick_1_z,5)+ ":"+
+      fixString(inputs_main.joystick_1_btn,1)+":"+
+      fixString(inputs_main.joystick_2_x,5)+":"+
+      fixString(inputs_main.joystick_2_y,5)+":"+
+      fixString(inputs_main.joystick_2_z,5)+":"+
+      fixString(inputs_main.joystick_2_btn,1)+":"+
+      fixString(inputs_main.btn_1,1)+":"+
+      fixString(inputs_main.btn_2,1)+":"+
+      fixString(inputs_main.btn_3,1)+":"+
+      fixString(inputs_main.btn_4,1)+":"+
+      fixString(inputs_main.btn_5,1)+":"+
+      fixString(inputs_main.btn_6,1)+":"+
+      fixString(inputs_main.btn_7,1)+":"+
+      fixString(inputs_main.btn_8,1)+":"+ 
+      UDP_END;
+    
+    // Serial.println(data);
+    if(Wifi_Connected){
+      udp.beginPacket(remoteIP, remotePort);
+      udp.print(data);
+      udp.endPacket();
+    }
+    vTaskDelay(pdMS_TO_TICKS(send_delay));
+  }
+}
+
+void Task_Conenct_to_Wifi(void *param)
+{
+  while (1)
+  {
+    WaitForConnection(); 
+    vTaskDelay(50);
+  }
+  
+}
+
+void Task_ReadingInputs(void *param)
+{
+  while (1)
+  {
+    inputs_main.joystick_1_x = joystick1.readX();
+    inputs_main.joystick_1_y = joystick1.readY();
+    inputs_main.joystick_1_z = joystick1.readZ();
+    inputs_main.joystick_1_btn = joystick1.readBtn();
+
+    inputs_main.joystick_2_x = joystick2.readX();
+    inputs_main.joystick_2_y = joystick2.readY();
+    inputs_main.joystick_2_z = joystick2.readZ();
+    inputs_main.joystick_2_btn = joystick2.readBtn();
+
+    inputs_main.btn_1 = InOut::ReadInput(PIN_MS_BTN_1);
+    inputs_main.btn_2 = InOut::ReadInput(PIN_MS_BTN_2);
+    inputs_main.btn_3 = InOut::ReadInput(PIN_MS_BTN_3);
+    inputs_main.btn_4 = InOut::ReadInput(PIN_MS_BTN_4);
+    inputs_main.btn_5 = InOut::ReadInput(PIN_MS_BTN_5);
+    inputs_main.btn_6 = InOut::ReadInput(PIN_MS_BTN_6);
+    inputs_main.btn_7 = InOut::ReadInput(PIN_MS_BTN_7);
+    inputs_main.btn_8 = InOut::ReadInput(PIN_MS_BTN_8);
+    vTaskDelay(5); 
+  }
 }
 
 

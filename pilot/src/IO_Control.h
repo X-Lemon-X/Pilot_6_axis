@@ -8,6 +8,11 @@
 namespace IO_Control
 {
 
+  #define RESOLUTION_8_BIT 256
+  #define RESOLUTION_10_BIT 1026
+  #define RESOLUTION_12_BIT 4096
+  #define RESOLUTION_14_BIT 16384
+
   class FourAxisJoystick
   {
     private:
@@ -38,8 +43,7 @@ namespace IO_Control
       void resolutionSet(int resolution);
 
     public:
-      #define RESOLUTION_10_BIT 1026
-      #define RESOLUTION_12_BIT 4096
+
 
       FourAxisJoystick();
       ~FourAxisJoystick();

@@ -98,10 +98,33 @@ using namespace IO_Control;
 
   int FourAxisJoystick::ReadAna(int pin, int offset, float *prev)
   {
+    
     float value = (float)analogRead(pin) - (float)offset;
     
     value = (value * multi_cur) + (*prev * multi_prev);
     *prev = value;
+
+//     Serial.print("v:");
+//     Serial.print(value);
+//     Serial.print("  ");
+//     Serial.print("p:");
+//     Serial.print(*prev);
+//     Serial.print("  ");
+//     Serial.print("o:");
+//     Serial.print(offset);
+//     Serial.print("  ");
+//     Serial.print("mi:");
+//     Serial.print(map_min);
+//     Serial.print("  ");
+//     Serial.print("ma:");
+//     Serial.print(map_max);
+//  Serial.print("  ");
+//     Serial.print("Min:");
+//     Serial.print(RESOLUTION/2);
+//     Serial.print("  ");
+//     Serial.print("Max:");
+//     Serial.println(RESOLUTION - offset);
+
 
     if(value >= RESOLUTION/ 2)
       return map((int)value, RESOLUTION/2, RESOLUTION - offset, map_middle, map_max);
