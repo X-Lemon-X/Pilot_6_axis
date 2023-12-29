@@ -1,4 +1,4 @@
-##Simple Kick ass Remote Controler
+## Simple Kick ass Remote Controler
 - Works over Wi-fi
 - With up to 6 networks saved (with priority from  1 to 6)
 - All setings of the rc can be changed on a website
