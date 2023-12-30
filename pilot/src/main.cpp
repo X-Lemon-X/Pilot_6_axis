@@ -14,8 +14,6 @@
 #include <string>
 #include "esp32-hal-cpu.h"
 
-
-
 #include "IO_Control.h"
 #include "PassGenerator.h"
 #include "SetingsPage.h"
@@ -33,7 +31,7 @@
 //----------------------IMPORTANT----BUILDING
 
 // #define SAVE_TO_FLASH  // only use once to save new setings to flash -> Flush ESP32 with it uncomented then Flush again without it //newer work with it uncommented or it will break EPPROM 
-
+// #define DEBUG
 
 //-----------------------------INFO
 #define VERSION 2.1
@@ -200,8 +198,8 @@ void LoadSetings()
   setings_data.AddSeting("int_Joystick_right_MMin",-2048);
   setings_data.AddSeting("int_Joystick_right_MMax",2048);
 
-  setings_data.AddSeting("int_Joystick_right_filer",0.95f);
-  setings_data.AddSeting("int_Joystick_left_filer",0.95f);
+  setings_data.AddSeting("flo_Joystick_right_filer",0.95f);
+  setings_data.AddSeting("flo_Joystick_left_filer",0.95f);
 
   #pragma endregion
 
@@ -278,12 +276,12 @@ void GPIOinit()
   //joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2, 0.95f);
   
   joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1,
-    setings_data.GetSeting("int_Joystick_left_filer").data._float,
+    setings_data.GetSeting("flo_Joystick_left_filer").data._float,
     setings_data.GetSeting("int_Joystick_left_MMin").data._int,
     setings_data.GetSeting("int_Joystick_left_MMax").data._int);
 
   joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2,
-    setings_data.GetSeting("int_Joystick_right_filer").data._float,
+    setings_data.GetSeting("flo_Joystick_right_filer").data._float,
     setings_data.GetSeting("int_Joystick_right_MMin").data._int,
     setings_data.GetSeting("int_Joystick_right_MMax").data._int);
   
@@ -326,7 +324,7 @@ void InitAllWebEvents()
     for (auto element = setings_data._setings.begin(); element!= setings_data._setings.end(); ++element)
     {
       val_table_mid = val_table_mid + "\n <tr><td>" + element->first + "</td> <td><input type=\"text\" name=\"" 
-      + element->first+ "\" value=\""+ Setings::GetStringFromSeting(element->second)+"\"></td> </tr>"; 
+      + element->first+ "\"  , style=\"background-color: #1c1c1c; color: white;\" value=\""+ Setings::GetStringFromSeting(element->second)+"\"></td> </tr>"; 
     }
     std::string val_page = std::string(MAIN_page_beg) + val_table_mid.c_str() + std::string(MAIN_page_end);  
 
@@ -347,8 +345,11 @@ void InitAllWebEvents()
       Println("code:" + String(err));
       errors_count +=err;
     }
-   std::string val_page = "Setings [" +std::to_string(request->params())+ "] send to be updated, not updated [" + 
-   std::to_string(errors_count) + "] <br><a href=\"/\">Return to Setings Page</a>";
+   std::string val_page = 
+    "<!DOCTYPE HTML><html><head> <title>RC 6D</title> <body style=\"background-color:#1c1c1c; color: white;\"></body> <body> Setings [" +
+    std::to_string(request->params())+ 
+    "] send to be updated, not updated [" + std::to_string(errors_count) +
+    "] <br><a href=\"/\">Return to Setings Page</a>";
    setings_data.SaveSetingsToFlash();
    request->send(200, "text/html", val_page.c_str());
   });
@@ -474,9 +475,9 @@ void InitSetupMode()
   InitAllWebEvents();
   Println("--Setup mode--");
   Println("http://192.168.4.1");
-  Print("sd:");
+  Println("sd:");
   Println(String(ssid));
-  Print("pw:");
+  Println("pw:");
   Println(String(WIFIpasssword.c_str()));
 }
 
@@ -486,7 +487,6 @@ void InitNormalMode()
   xTaskCreate(Task_Conenct_to_Wifi,"Twifi",3000, NULL, 3,NULL);
   xTaskCreate(Task_SendUDP_data,"Tudp",3000, NULL, 3,NULL);
 }
-
 
 void setup() {
 
@@ -528,7 +528,9 @@ void Task_SendUDP_data(void *param)
 
   unsigned int remotePort = setings_data.GetSeting("str_host_port").data._int;;
   float send_delay =  1000.0 / (float)setings_data.GetSeting("int_upd_freq").data._int;
-
+  
+//   size_t count=0;
+// size_t ti = micros();
   while(1){
     String data = UDP_BEGIN +
       fixString(inputs_main.joystick_1_x,5)+ ":"+
@@ -555,6 +557,12 @@ void Task_SendUDP_data(void *param)
       udp.print(data);
       udp.endPacket();
     }
+    // count++;
+    // if(count>1000){
+    //   size_t tf = micros();
+    //   Serial.println("time:" + String((double)(tf-ti)/1000000.0));
+    //   ti = micros();
+    // }
     vTaskDelay(pdMS_TO_TICKS(send_delay));
   }
 }

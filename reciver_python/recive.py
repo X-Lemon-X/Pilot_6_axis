@@ -73,9 +73,10 @@ da="$RC:  -17:  -13:  -11:1:  -11:   -9:   -4:1:1:1:1:1:1:1:1:1:#\r"
 
 # print(data.joystick_1_x)
 # Usage example
+listLastData = []
 def handle_receive(data: RemoteControler6D):
   print(data)
-
+  
 receiver = UDPReceiver(25000)
 receiver.on_receive(handle_receive)
 receiver.start()

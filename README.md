@@ -3,7 +3,7 @@
 - With up to 6 networks saved (with priority from  1 to 6)
 - All setings of the rc can be changed on a website
 - Controled inertia of joysticks and signal values
-- Veriable signal Frequency
+- Veriable signal Frequency up to 200Hz
 - Auto zero positioning (no more robots moving in slow speed without touching the pilot)
 - USB-C charged!
 - 3-DOF joysticks
