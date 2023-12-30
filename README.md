@@ -11,8 +11,8 @@
 - Integrated LCD
 - RC remembers setings so no need to set it up every time or reprogram it.
 
-![Image](images/pilot_2.PNG)
-![Image](images/pilot_1.PNG)
+![Image](images/pilot_2.png)
+![Image](images/pilot_1.png)
 
 
 ## Required component list
