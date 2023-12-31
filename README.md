@@ -16,7 +16,7 @@
 
 ## Data frame
  Consist of 18 elemnts separated by ':'.
-Depending from the settings int_Joystick_(left/right)_(MMin/MMax) value return by joystick will very. This seting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
+Depending from the settings int_Joystick_(left/right)_(MMin/MMax) value return by joystick will very. This setting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
 ```
  Example: "$RC:  340:   200:    12:1:  500:-2045: 2045:1:1:1:0:1:1:0:1:0:#\r"
 ```
@@ -49,7 +49,7 @@ Depending from the settings int_Joystick_(left/right)_(MMin/MMax) value return b
   6. To leave setup mode shut down the rc and turn it on again.
   7. Now the Rc will connect to the network with the highest priority that is available. If it can't connect to any of the saved networks it will keep trying to connect to them. If the rc is connected to the network it will display the IP address on the LCD and show Conencted status.
   9. Now setup is done and you can use the rc.
-### Setings explained
+### Settings explained
   - int_Joystick_left_MMin -> minimum value of the left joystick  x,y,z axis in the end of the range 
   - int_Joystick_left_MMax -> maximum value of the left joystick  x,y,z axis in the end of the range
   - flo_Joystick_left_filer -> inertia of the left joystick (0.0-1.0), the higher the value response of the joystick value will be faster.
