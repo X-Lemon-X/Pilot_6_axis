@@ -1,7 +1,7 @@
 ## Simple Kick Ass Remote Controler
 - Works over Wi-Fi ( sends constant length ASCI data frame)
 - With up to 6 networks saved (with priority from  1 to 6)
-- All setings of the rc can be changed on a website
+- All settings of the rc can be changed on a website
 - Controled inertia of the joysticks (defasult 0.95) and signal values of the joystick coordinates (default -2048 to 2048 but can be anything (JUST KEEP IN UDDER ABS(val) val<=9999))
 - Veriable signal refresh rate up to 200Hz
 - Auto zero positioning (no more robots moving in slow speed without touching the pilot)
@@ -9,14 +9,14 @@
 - 3-DOF joysticks
 - 10 buttons (2 of which are on JS)
 - Integrated LCD
-- RC remembers setings so no need to set it up every time or reprogram it.
+- RC remembers settings so no need to set it up every time or reprogram it.
 
 ![Image](images/pilot_2.png)
 ![Image](images/pilot_1.png)
 
 ## Data frame
  Consist of 18 elemnts separated by ':'.
-Depending from the setings int_Joystick_(left/right)_(MMin/MMax) value return by joystick will very. This seting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
+Depending from the settings int_Joystick_(left/right)_(MMin/MMax) value return by joystick will very. This seting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
 ```
  Example: "$RC:  340:   200:    12:1:  500:-2045: 2045:1:1:1:0:1:1:0:1:0:#\r"
 ```
@@ -45,7 +45,7 @@ Depending from the setings int_Joystick_(left/right)_(MMin/MMax) value return by
   1. Enable setup mode press and hold most center button 4 or 5 (doesn't metter which one).
   2. Connect to the rc Wi-Fi network that is diaplayed on  the LCD.
   3. Open web browser and go to url displayed on the LCD.
-  4. Set up the setings of the rc and press save buttons on the bottom of the page. This will redirect you to the page where you will see if setings were saved. if you amde some error it will be shown here.
+  4. Set up the settings of the rc and press save buttons on the bottom of the page. This will redirect you to the page where you will see if setings were saved. if you amde some error it will be shown here.
   6. To leave setup mode shut down the rc and turn it on again.
   7. Now the Rc will connect to the network with the highest priority that is available. If it can't connect to any of the saved networks it will keep trying to connect to them. If the rc is connected to the network it will display the IP address on the LCD and show Conencted status.
   9. Now setup is done and you can use the rc.
