@@ -50,11 +50,11 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
   6. Now the Rc will connect to the network with the highest priority that is available. If it can't connect to any of the saved networks it will keep trying to connect to them. If the Rc is connected to the network it will display the IP address on the LCD and show Connected status.
   7. Now setup is done and you can use the Rc.
 ### Settings explained
-  - int_Joystick_left_MMin -> minimum value of the left joystick  x,y,z axis in the end of the range 
-  - int_Joystick_left_MMax -> maximum value of the left joystick  x,y,z axis in the max of the range
+  - int_Joystick_left_MMin -> minimum value of the left joystick  x,y,z axis on the min of the range 
+  - int_Joystick_left_MMax -> maximum value of the left joystick  x,y,z axis on the max of the range
   - flo_Joystick_left_filer -> inertia of the left joystick (0.0-1.0), the higher the value response of the joystick value will be faster.
-  - int_Joystick_right_MMin -> minimum value of the right joystick  x,y,z axis in the end of the range
-  - int_Joystick_right_MMax -> maximum value of the right joystick  x,y,z axis in the max of the range
+  - int_Joystick_right_MMin -> minimum value of the right joystick  x,y,z axis on the min of the range
+  - int_Joystick_right_MMax -> maximum value of the right joystick  x,y,z axis on the max of the range
   - flo_Joystick_right_filer  -> inertia of the right joystick (0.0-1.0)
   - int_upd_freq  => frequendy of sending data frame
   - str_host_wifi => IP address to whitch the Rc will send data frame
