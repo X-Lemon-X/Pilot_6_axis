@@ -1,7 +1,7 @@
 ## Simple Kick Ass Remote Controler
 - Works over Wi-Fi ( sends constant length ASCI data frame)
 - With up to 6 networks saved (with priority from  1 to 6)
-- All settings of the rc can be changed on a website
+- All settings of the Rc can be changed on a website
 - Controled inertia of the joysticks and signal values of the joystick coordinates
 - Veriable signal refresh rate up to 200Hz
 - Auto zero positioning (no more robots moving in slow speed without touching the pilot)
@@ -9,7 +9,7 @@
 - 3-DOF joysticks
 - 10 buttons (2 of which are on JS)
 - Integrated LCD
-- RC remembers settings so no need to set it up every time or reprogram it.
+- Rc remembers settings so no need to set it up every time or reprogram it.
 
 ![Image](images/pilot_2.png)
 ![Image](images/pilot_1.png)
@@ -18,10 +18,10 @@
  Consist of 18 elements separated by ':'.
 Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned by joystick will vary. This setting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
 ```
- Example: "$RC:  340:   200:   12:1:  500:-2045: 2045:1:1:1:0:1:1:0:1:0:#\r"
+ Example: "$Rc:  340:   200:   12:1:  500:-2045: 2045:1:1:1:0:1:1:0:1:0:#\r"
 ```
 
- 1. control beginning "$RC"
+ 1. control beginning "$Rc"
  2. joystick_left_x   (5-characters) 
  3. joystick_left_y   (5-characters)
  4. joystick_left_z   (5-characters)
@@ -43,12 +43,12 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
 ## How to use
 ### Setup
   1. Enable setup mode press and hold most centeral button 4 or 5 (doesn't matter which one).
-  2. Connect to the rc Wi-Fi network that is displayed on  the LCD.
+  2. Connect to the Rc Wi-Fi network that is displayed on  the LCD.
   3. Open web browser and go to url displayed on the LCD.
-  4. Set up the settings of the rc and press save buttons on the bottom of the page. This will redirect you to the page where you will see if settings were saved. If you made some error it will be shown here.
-  6. To leave setup mode shut down the rc and turn it on again.
-  7. Now the Rc will connect to the network with the highest priority that is available. If it can't connect to any of the saved networks it will keep trying to connect to them. If the rc is connected to the network it will display the IP address on the LCD and show Conencted status.
-  9. Now setup is done and you can use the rc.
+  4. Set up the settings of the Rc and press save buttons on the bottom of the page. This will redirect you to the page where you will see if settings were saved. If you made some error it will be shown here.
+  6. To leave setup mode shut down the Rc and turn it on again.
+  7. Now the Rc will connect to the network with the highest priority that is available. If it can't connect to any of the saved networks it will keep trying to connect to them. If the Rc is connected to the network it will display the IP address on the LCD and show Conencted status.
+  9. Now setup is done and you can use the Rc.
 ### Settings explained
   - int_Joystick_left_MMin -> minimum value of the left joystick  x,y,z axis in the end of the range 
   - int_Joystick_left_MMax -> maximum value of the left joystick  x,y,z axis in the end of the range
@@ -57,9 +57,9 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
   - int_Joystick_right_MMax -> maximum value of the right joystick  x,y,z axis in the end of the range
   - flo_Joystick_right_filer  -> inertia of the right joystick (0.0-1.0)
   - int_upd_freq  => frequendy of sending data frame
-  - str_host_wifi => IP address to whitch the rc will send data frame
-  - str_host_port => port to whitch the rc will send data frame
-  - str_passwd  =>  password of the network of the rc in setup mode
+  - str_host_wifi => IP address to whitch the Rc will send data frame
+  - str_host_port => port to whitch the Rc will send data frame
+  - str_passwd  =>  password of the network of the Rc in setup mode
   - str_WIFI_(number 1-6)_S =>  SSID of the network      (where number means priority from 1 to 6)
   - str_WIFI_(number 1-6)_P =>  Password of the network
 
