@@ -2,7 +2,7 @@
 - Works over Wi-Fi ( sends constant length ASCI data frame)
 - With up to 6 networks saved (with priority from  1 to 6)
 - All settings of the rc can be changed on a website
-- Controled inertia of the joysticks (defasult 0.95) and signal values of the joystick coordinates (default -2048 to 2048 but can be anything (JUST KEEP IN UDDER ABS(val) val<=9999))
+- Controled inertia of the joysticks (default 0.95) and signal values of the joystick coordinates (default -2048 to 2048 but can be anything (JUST KEEP IN UDDER ABS(val) val<=9999))
 - Veriable signal refresh rate up to 200Hz
 - Auto zero positioning (no more robots moving in slow speed without touching the pilot)
 - USB-C charged!
