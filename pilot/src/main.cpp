@@ -65,7 +65,7 @@
 //-----------------------------ADDITIONAL PINOUT
 #define PIN_BATTERY_VOLTAGE
 
-//-----------------------------OLED DISPLAY
+//--------------WIFIpasssword.c_str()---------------OLED DISPLAY
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define SCREEN_ADDRESS 0x3C
@@ -143,7 +143,7 @@ void Task_SendUDP_data(void *param);
 void Print(String string)
 {
   #ifdef DEBUG
-    print(string);
+    Serial.print(string);
   #endif
   oledPrint->Print(string);
 }
@@ -151,7 +151,7 @@ void Print(String string)
 void Println(String string)
 {
   #ifdef DEBUG
-    print(string);
+    Serial.println(string);
   #endif
   oledPrint->Println(string);
 }
@@ -212,7 +212,9 @@ void LoadSetings()
   #pragma region WIFI
 
   setings_data.AddSeting("str_host_wifi",std::string("192.168.1.210"));
-  setings_data.AddSeting("str_host_port",25000);
+  setings_data.AddSeting("int_host_port",25000);
+
+  setings_data.AddSeting("str_passwd",std::string("qwerty1234"));
 
   setings_data.AddSeting("int_upd_freq",40);
 
@@ -314,9 +316,16 @@ void PageNotFound(AsyncWebServerRequest *request) {
 void InitAllWebEvents()
 {
   //WIFIpasssword = PassGenerator_GeneratePassword(WIFI_PASSWORD_LENGTH);
+  char *wifipw = setings_data.GetSeting("str_passwd").data._string;
+  #ifdef DEBUG
+    Serial.println("wifi setup sd:");
+    Serial.println(ssid);
+    Serial.println("wifi setup pw:");
+    Serial.println(wifipw);
+  #endif
 
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(ssid, WIFIpasssword.c_str());
+  WiFi.softAP(ssid, wifipw);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     
@@ -478,7 +487,7 @@ void InitSetupMode()
   Println("sd:");
   Println(String(ssid));
   Println("pw:");
-  Println(String(WIFIpasssword.c_str()));
+  Println(String(setings_data.GetSeting("str_passwd").data._string));
 }
 
 void InitNormalMode()
@@ -526,7 +535,7 @@ void Task_SendUDP_data(void *param)
   IPAddress remoteIP;
   remoteIP.fromString(setings_data.GetSeting("str_host_wifi").data._string);
 
-  unsigned int remotePort = setings_data.GetSeting("str_host_port").data._int;;
+  unsigned int remotePort = setings_data.GetSeting("int_host_port").data._int;;
   float send_delay =  1000.0 / (float)setings_data.GetSeting("int_upd_freq").data._int;
   
 //   size_t count=0;

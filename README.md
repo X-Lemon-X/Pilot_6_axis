@@ -40,6 +40,28 @@ Depending from the setings int_Joystick_(left/right)_(MMin/MMax) value return by
  17. btn_8  (1-character)
  18. control end "#\r"
 
+## How to use
+### Setup
+  1. Enable setup mode press and hold most center button 4 or 5 (doesn't metter which one).
+  2. Connect to the rc Wi-Fi network that is diaplayed on  the LCD.
+  3. Open web browser and go to url displayed on the LCD.
+  4. Set up the setings of the rc and press save buttons on the bottom of the page. This will redirect you to the page where you will see if setings were saved. if you amde some error it will be shown here.
+  6. To leave setup mode shut down the rc and turn it on again.
+  7. Now the Rc will connect to the network with the highest priority that is available. If it can't connect to any of the saved networks it will keep trying to connect to them. If the rc is connected to the network it will display the IP address on the LCD and show Conencted status.
+  9. Now setup is done and you can use the rc.
+### Setings explained
+  - int_Joystick_left_MMin -> minimum value of the left joystick  x,y,z axis in the end of the range 
+  - int_Joystick_left_MMax -> maximum value of the left joystick  x,y,z axis in the end of the range
+  - flo_Joystick_left_filer -> inertia of the left joystick (0.0-1.0), the higher the value response of the joystick value will be faster.
+  - int_Joystick_right_MMin -> minimum value of the right joystick  x,y,z axis in the end of the range
+  - int_Joystick_right_MMax -> maximum value of the right joystick  x,y,z axis in the end of the range
+  - flo_Joystick_right_filer  -> inertia of the right joystick (0.0-1.0)
+  - int_upd_freq  => frequendy of sending data frame
+  - str_host_wifi => IP address to whitch the rc will send data frame
+  - str_host_port => port to whitch the rc will send data frame
+  - str_passwd  =>  password of the network of the rc in setup mode
+  - str_WIFI_(number 1-6)_S =>  SSID of the network      (where number means priority from 1 to 6)
+  - str_WIFI_(number 1-6)_P =>  Password of the network
 
 
 
