@@ -62,7 +62,7 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
   - str_passwd  =>  password of the wifi network made by the the Rc in setup mode
   - str_WIFI_(number 1-6)_S =>  SSID of the wifi network      (where number means priority from 1 to 6)
   - str_WIFI_(number 1-6)_P =>  Password of the wifi network
-the prefix means the type of the value the filed is expecting 
+  - the prefix means the type of the value the field is expecting 
 
 
 
@@ -92,7 +92,7 @@ the prefix means the type of the value the filed is expecting
 - LCD 1.3" 128x64 OLED SSD1306
   ![LCD 1.3" 128x64 OLED SSD1306](images/lcd_small.png)
 
-- Antena 2.4GHz 3dBi WiFi 2.4GHz RP-SMA
+- Antena 2.4GHz 3dB WiFi 2.4GHz RP-SMA
   ![Antena 2.4GHz 3dBi WiFi 2.4GHz RP-SMA](images/antena_small.png)
 
 - M3 6mm hex socket flat countersunk x 14 
