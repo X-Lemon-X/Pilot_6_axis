@@ -15,8 +15,8 @@
 ![Image](images/pilot_1.png)
 
 ## Data frame
- Consist of 18 elemnts separated by ':'.
-Depending from the settings int_Joystick_(left/right)_(MMin/MMax) value return by joystick will very. This setting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
+ Consist of 18 elements separated by ':'.
+Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned by joystick will vary. This setting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
 ```
  Example: "$RC:  340:   200:    12:1:  500:-2045: 2045:1:1:1:0:1:1:0:1:0:#\r"
 ```
