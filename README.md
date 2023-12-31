@@ -1,9 +1,9 @@
 ## Simple Kick Ass Remote Controler
-- Works over Wi-fi
+- Works over Wi-Fi ( sends constant length ASCI data frame)
 - With up to 6 networks saved (with priority from  1 to 6)
 - All setings of the rc can be changed on a website
-- Controled inertia of joysticks and signal values
-- Veriable signal Frequency up to 200Hz
+- Controled inertia of the joysticks (defasult 0.95) and signal values of the joystick coordinates (default -2048 to 2048 but can be anything (JUST KEEP IN UDDER ABS(val) val<=9999))
+- Veriable signal refresh rate up to 200Hz
 - Auto zero positioning (no more robots moving in slow speed without touching the pilot)
 - USB-C charged!
 - 3-DOF joysticks
@@ -13,6 +13,34 @@
 
 ![Image](images/pilot_2.png)
 ![Image](images/pilot_1.png)
+
+## Data frame
+ Consist of 18 elemnts separated by ':'.
+Depending from the setings int_Joystick_(left/right)_(MMin/MMax) value return by joystick will very. This seting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
+```
+ Example: "$RC:  340:   200:    12:1:  500:-2045: 2045:1:1:1:0:1:1:0:1:0:#\r"
+```
+
+ 1. control beginning "$RC"
+ 2. joystick_left_x   (5-characters) 
+ 3. joystick_left_y   (5-characters)
+ 4. joystick_left_z   (5-characters)
+ 5. joystick_left_btn  (1-character)
+ 6. joystick_right_x   (5-characters)
+ 7. joystick_right_y   (5-characters)
+ 8. joystick_right_z   (5-characters)
+ 9. joystick_right_btn  (1-character)
+ 10. btn_1  (1-character)
+ 11. btn_2  (1-character)
+ 12. btn_3  (1-character)
+ 13. btn_4  (1-character)
+ 14. btn_5  (1-character)
+ 15. btn_6  (1-character)
+ 16. btn_7  (1-character)
+ 17. btn_8  (1-character)
+ 18. control end "#\r"
+
+
 
 
 ## Required component list

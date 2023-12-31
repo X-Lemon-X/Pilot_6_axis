@@ -584,21 +584,21 @@ void Task_ReadingInputs(void *param)
     inputs_main.joystick_1_x = joystick1.readX();
     inputs_main.joystick_1_y = joystick1.readY();
     inputs_main.joystick_1_z = joystick1.readZ();
-    inputs_main.joystick_1_btn = joystick1.readBtn();
+    inputs_main.joystick_1_btn = !joystick1.readBtn();
 
     inputs_main.joystick_2_x = joystick2.readX();
     inputs_main.joystick_2_y = joystick2.readY();
     inputs_main.joystick_2_z = joystick2.readZ();
-    inputs_main.joystick_2_btn = joystick2.readBtn();
+    inputs_main.joystick_2_btn = !joystick2.readBtn();
 
-    inputs_main.btn_1 = InOut::ReadInput(PIN_MS_BTN_1);
-    inputs_main.btn_2 = InOut::ReadInput(PIN_MS_BTN_2);
-    inputs_main.btn_3 = InOut::ReadInput(PIN_MS_BTN_3);
-    inputs_main.btn_4 = InOut::ReadInput(PIN_MS_BTN_4);
-    inputs_main.btn_5 = InOut::ReadInput(PIN_MS_BTN_5);
-    inputs_main.btn_6 = InOut::ReadInput(PIN_MS_BTN_6);
-    inputs_main.btn_7 = InOut::ReadInput(PIN_MS_BTN_7);
-    inputs_main.btn_8 = InOut::ReadInput(PIN_MS_BTN_8);
+    inputs_main.btn_1 = !InOut::ReadInput(PIN_MS_BTN_1);
+    inputs_main.btn_2 = !InOut::ReadInput(PIN_MS_BTN_2);
+    inputs_main.btn_3 = !InOut::ReadInput(PIN_MS_BTN_3);
+    inputs_main.btn_4 = !InOut::ReadInput(PIN_MS_BTN_4);
+    inputs_main.btn_5 = !InOut::ReadInput(PIN_MS_BTN_5);
+    inputs_main.btn_6 = !InOut::ReadInput(PIN_MS_BTN_6);
+    inputs_main.btn_7 = !InOut::ReadInput(PIN_MS_BTN_7);
+    inputs_main.btn_8 = !InOut::ReadInput(PIN_MS_BTN_8);
     vTaskDelay(5); 
   }
 }

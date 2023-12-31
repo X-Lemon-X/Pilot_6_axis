@@ -26,8 +26,8 @@ int InOut::GetAvarageAnalog(int pin, int count)
 
 int InOut::ReadInput(int pin)
 {
-    int in;
-    do in = digitalRead(pin);
-    while (in != digitalRead(pin));
-    return in;
+  int in;
+  do in = digitalRead(pin);
+  while (in != digitalRead(pin));
+  return in;
 } 
