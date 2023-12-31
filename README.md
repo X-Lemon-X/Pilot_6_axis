@@ -52,16 +52,17 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
 ### Settings explained
   - int_Joystick_left_MMin -> minimum value of the left joystick  x,y,z axis on the min of the range 
   - int_Joystick_left_MMax -> maximum value of the left joystick  x,y,z axis on the max of the range
-  - flo_Joystick_left_filer -> inertia of the left joystick (0-1), the higher the value response of the joystick value will be faster.
+  - flo_Joystick_left_filer -> inertia of the left joystick (0-1), the higher inertia the response of the joystick value will be faster.
   - int_Joystick_right_MMin -> minimum value of the right joystick  x,y,z axis on the min of the range
   - int_Joystick_right_MMax -> maximum value of the right joystick  x,y,z axis on the max of the range
   - flo_Joystick_right_filer  -> inertia of the right joystick (0-1)
-  - int_upd_freq  => frequendy of sending data frame
+  - int_upd_freq  => frequency of sending data frame
   - str_host_wifi => IP address to whitch the Rc will send data frame
   - str_host_port => port to whitch the Rc will send data frame
-  - str_passwd  =>  password of the network of the Rc in setup mode
-  - str_WIFI_(number 1-6)_S =>  SSID of the network      (where number means priority from 1 to 6)
-  - str_WIFI_(number 1-6)_P =>  Password of the network
+  - str_passwd  =>  password of the wifi network made by the the Rc in setup mode
+  - str_WIFI_(number 1-6)_S =>  SSID of the wifi network      (where number means priority from 1 to 6)
+  - str_WIFI_(number 1-6)_P =>  Password of the wifi network
+the prefix means the type of the value the filed is expecting 
 
 
 
