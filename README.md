@@ -42,7 +42,7 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
 
 ## How to use
 ### Setup
-  1. Enable setup mode press and hold most centeral button 4 or 5 (doesn't matter which one).
+  1. Enable setup mode by pressing and holding the most centeral button 4 or 5 when turning the Rc On (doesn't matter which one).
   2. Connect to the Rc Wi-Fi network that is displayed on  the LCD.
   3. Open web browser and go to url displayed on the LCD.
   4. Set up the settings of the Rc and press save buttons on the bottom of the page. This will redirect you to the page where you will see if settings were saved. If you made some error it will be shown here.
