@@ -8,7 +8,7 @@ const char MAIN_page_beg[] PROGMEM = R"rawliteral(
     h2 {font-size: 3.0rem; color: #0bcfe4;}
   </style>
   </head><body>
-  <h2>Remote Controler 6D Setings</h2> 
+  <h2>Remote Controler 6D Settings</h2> 
 
   <form action="/get">
   <table border="1">

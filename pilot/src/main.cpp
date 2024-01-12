@@ -355,10 +355,10 @@ void InitAllWebEvents()
       errors_count +=err;
     }
    std::string val_page = 
-    "<!DOCTYPE HTML><html><head> <title>RC 6D</title> <body style=\"background-color:#1c1c1c; color: white;\"></body> <body> Setings [" +
+    "<!DOCTYPE HTML><html><head> <title>RC 6D</title> <body style=\"background-color:#1c1c1c; color: white;\"></body> <body> Settings [" +
     std::to_string(request->params())+ 
-    "] send to be updated, not updated [" + std::to_string(errors_count) +
-    "] <br><a href=\"/\">Return to Setings Page</a>";
+    "] send to be updated, errosrs: [" + std::to_string(errors_count) +
+    "] (settings not updated) <br><a href=\"/\">Return to Setings Page</a>";
    setings_data.SaveSetingsToFlash();
    request->send(200, "text/html", val_page.c_str());
   });
