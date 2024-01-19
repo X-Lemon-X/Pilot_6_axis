@@ -2,6 +2,8 @@ import socket
 import threading
 from typing import Callable
 import time
+import socket
+import random
 
 
 BUFFER_SISE = 1024
@@ -67,7 +69,16 @@ class RemoteControler6D:
     return f"frequency={self.frequency:.2f}Hz   Data=" + self.__bytes
 
 
-da="$RC:  -17:  -13:  -11:1:  -11:   -9:   -4:1:1:1:1:1:1:1:1:1:#\r"
+
+UDP_IP = "192.168.2.43"  # Replace with the IP address of the destination
+UDP_PORT = 25000
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+while True:
+  data = f"$RC:{int(random.random()*100000)}:  -13:  -11:1:  -11:   -9:   -4:1:1:1:1:1:1:1:1:1:#\r"
+  sock.sendto(data.encode('ascii'), (UDP_IP, UDP_PORT))
+  print(data)
+  time.sleep(0.5)
 
 # data = RemoteControler6D(da)
 
