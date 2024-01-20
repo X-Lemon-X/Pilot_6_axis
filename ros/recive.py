@@ -34,7 +34,8 @@ class UDPReceiver:
             self.receive_event(data_structure)
         except ValueError:
           pass
-      except Exception:
+      except Exception as e:
+        print(f"Error {e}")
         pass
 
 class RemoteControler6D:
@@ -69,29 +70,29 @@ class RemoteControler6D:
     return f"frequency={self.frequency:.2f}Hz   Data=" + self.__bytes
 
 
+if __name__ == "__main__":
+  UDP_IP = "192.168.1.210"  # Replace with the IP address of the destination
+  UDP_PORT = 25000
 
-UDP_IP = "192.168.2.43"  # Replace with the IP address of the destination
-UDP_PORT = 25000
+  sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+  while True:
+    data = f"$RC:{int(random.random()*100000)}:  -13:  -11:1:  -11:   -9:   -4:1:1:1:1:1:1:1:1:1:#\r"
+    sock.sendto(data.encode('ascii'), (UDP_IP, UDP_PORT))
+    print(data)
+    time.sleep(0.5)
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-while True:
-  data = f"$RC:{int(random.random()*100000)}:  -13:  -11:1:  -11:   -9:   -4:1:1:1:1:1:1:1:1:1:#\r"
-  sock.sendto(data.encode('ascii'), (UDP_IP, UDP_PORT))
-  print(data)
-  time.sleep(0.5)
+  # data = RemoteControler6D(da)
 
-# data = RemoteControler6D(da)
+  # print(data.joystick_1_x)
+  # Usage example
+  listLastData = []
+  def handle_receive(data: RemoteControler6D):
+    print(data)
+    
+  receiver = UDPReceiver(25000)
+  receiver.on_receive(handle_receive)
+  receiver.start()
 
-# print(data.joystick_1_x)
-# Usage example
-listLastData = []
-def handle_receive(data: RemoteControler6D):
-  print(data)
-  
-receiver = UDPReceiver(25000)
-receiver.on_receive(handle_receive)
-receiver.start()
-
-while True:
-  time.sleep(1)
+  while True:
+    time.sleep(1)
 
