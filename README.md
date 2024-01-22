@@ -1,4 +1,4 @@
-## Simple Kick Ass Remote Controler
+## Simple Remote Controler
 - Works over Wi-Fi ( sends constant length ASCI data frame)
 - With up to 6 networks saved (with priority from  1 to 6)
 - All settings of the Rc can be changed on a website
