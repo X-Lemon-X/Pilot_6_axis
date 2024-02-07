@@ -5,6 +5,14 @@ from sensor_msgs.msg import Joy
 from recive import UDPReceiver, RemoteControler6D
 
 
+###
+# dodać zerowanie pilota na zeże
+# dead mean switch
+# jak ros starci połączenie to wyzerować wyjścia
+# wyświtlacz ma pokazywąć do jakiego ip jest podłączony
+
+
+
 class MinimalPublisher(Node):
 
   def __init__(self):
@@ -15,12 +23,13 @@ class MinimalPublisher(Node):
     self.i = 0
     self.axes = [0.0] * 6  # Fill self.axes with a list of 6 float zeros
     self.buttons = [0] * 10  # Fill self.buttons with 10 zero integers
+    
     receiver = UDPReceiver(25000)
     receiver.on_receive(self.handle_receive)
     receiver.start()
 
   def map_value(self,value):
-    return (value + 2048) / 4096
+    return value/2048
 
   def handle_receive(self, data: RemoteControler6D):
     self.axes[0]=self.map_value(float(data.joystick_1_x))
