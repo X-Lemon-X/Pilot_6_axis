@@ -71,7 +71,7 @@ class RemoteControler6D:
 
 
 if __name__ == "__main__":
-  UDP_IP = "192.168.1.210"  # Replace with the IP address of the destination
+  UDP_IP = "192.168.2.105"  # Replace with the IP address of the destination
   UDP_PORT = 25000
 
   sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
