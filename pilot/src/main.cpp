@@ -454,6 +454,8 @@ bool ConnectWithAvailableWIfiNetwork()
           Println("Connected to:");
           Println(wifi[i][0]);
           Println(WiFi.localIP().toString());
+          Println("Sending data to:");
+          Println(setings_data.GetSeting("str_host_wifi").data._string);
           notConnected = false;
           break;
         }
