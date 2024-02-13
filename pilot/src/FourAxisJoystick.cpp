@@ -41,9 +41,9 @@ using namespace IO_Control;
 
   void FourAxisJoystick::AutoZero()
   {
-    offset_X = InOut::GetAvarageAnalog(pinX,30) - RESOLUTION/2;
-    offset_Y = InOut::GetAvarageAnalog(pinY,30) - RESOLUTION/2;
-    offset_Z = InOut::GetAvarageAnalog(pinZ,30) - RESOLUTION/2;
+    offset_X = InOut::GetAvarageAnalog(pinX,100) - RESOLUTION/2;
+    offset_Y = InOut::GetAvarageAnalog(pinY,100) - RESOLUTION/2;
+    offset_Z = InOut::GetAvarageAnalog(pinZ,100) - RESOLUTION/2;
   }
 
   void FourAxisJoystick::resolutionSet(int resolution)

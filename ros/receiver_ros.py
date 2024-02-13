@@ -2,7 +2,7 @@ import rclpy
 from rclpy.duration import Duration
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
-from ariadna_core.ariadna_joy.ariadna_joy.lemonx_receive import UDPReceiver, RemoteControler6D
+from lemonx_receive import UDPReceiver, RemoteControler6D
 
 ###
 # dead mean switch

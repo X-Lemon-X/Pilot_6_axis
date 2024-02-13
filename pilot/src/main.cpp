@@ -31,10 +31,10 @@
 //----------------------IMPORTANT----BUILDING
 
 // #define SAVE_TO_FLASH  // only use once to save new setings to flash -> Flush ESP32 with it uncomented then Flush again without it //newer work with it uncommented or it will break EPPROM 
-// #define DEBUG
+#define DEBUG
 
 //-----------------------------INFO
-#define VERSION 2.1
+#define VERSION 2.3
 
 
 
@@ -185,7 +185,6 @@ void PrintInfo()
 {
   Println("Remote Controler 6D");
   Println("ver: "+ String(VERSION));
-  delay(1000);
 }
 
 void LoadSetings()
@@ -273,9 +272,6 @@ void GPIOinit()
   pinMode(PIN_X_ROT_JOYSTIK_2, INPUT);
   pinMode(PIN_Y_ROT_JOYSTIK_2, INPUT);
   pinMode(PIN_Z_ROT_JOYSTIK_2, INPUT);
-
-  //joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1, 0.80f);
-  //joystick2.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_2, PIN_Y_ROT_JOYSTIK_2, PIN_Z_ROT_JOYSTIK_2, PIN_BTN_JOYSTIK_2, 0.95f);
   
   joystick1.init(RESOLUTION_12_BIT, PIN_X_ROT_JOYSTIK_1, PIN_Y_ROT_JOYSTIK_1, PIN_Z_ROT_JOYSTIK_1, PIN_BTN_JOYSTIK_1,
     setings_data.GetSeting("flo_Joystick_left_filer").data._float,
@@ -358,7 +354,7 @@ void InitAllWebEvents()
     "<!DOCTYPE HTML><html><head> <title>RC 6D</title> <body style=\"background-color:#1c1c1c; color: white;\"></body> <body> Settings [" +
     std::to_string(request->params())+ 
     "] send to be updated, errosrs: [" + std::to_string(errors_count) +
-    "] (settings not updated) <br><a href=\"/\">Return to Setings Page</a>";
+    "] (settings not updated) <br><a href=\"/\">Return to Settings Page</a>";
    setings_data.SaveSetingsToFlash();
    request->send(200, "text/html", val_page.c_str());
   });
@@ -453,9 +449,11 @@ bool ConnectWithAvailableWIfiNetwork()
         if(WiFi.status() == WL_CONNECTED){
           Println("Connected to:");
           Println(wifi[i][0]);
-          Println(WiFi.localIP().toString());
+          // Println(WiFi.localIP().toString());
           Println("Sending data to:");
           Println(setings_data.GetSeting("str_host_wifi").data._string);
+          Println("Port:");
+          Print(String(setings_data.GetSeting("int_host_port").data._int));
           notConnected = false;
           break;
         }
@@ -505,7 +503,7 @@ void setup() {
   DisplayInit();
   PrintInfo();
   LoadSetings();
-  PrintSetings(setings_data);
+  // PrintSetings(setings_data);
   GPIOinit();
 
   if(!InOut::ReadInput(PIN_MS_BTN_4) || !InOut::ReadInput(PIN_MS_BTN_5)){
@@ -590,26 +588,29 @@ void Task_Conenct_to_Wifi(void *param)
 
 void Task_ReadingInputs(void *param)
 {
+  InputsData inputs;
+
   while (1)
   {
-    inputs_main.joystick_1_x = joystick1.readX();
-    inputs_main.joystick_1_y = joystick1.readY();
-    inputs_main.joystick_1_z = joystick1.readZ();
-    inputs_main.joystick_1_btn = !joystick1.readBtn();
+    inputs.joystick_1_x = joystick1.readX();
+    inputs.joystick_1_y = joystick1.readY();
+    inputs.joystick_1_z = joystick1.readZ();
+    inputs.joystick_1_btn = !joystick1.readBtn();
 
-    inputs_main.joystick_2_x = joystick2.readX();
-    inputs_main.joystick_2_y = joystick2.readY();
-    inputs_main.joystick_2_z = joystick2.readZ();
-    inputs_main.joystick_2_btn = !joystick2.readBtn();
+    inputs.joystick_2_x = joystick2.readX();
+    inputs.joystick_2_y = joystick2.readY();
+    inputs.joystick_2_z = joystick2.readZ();
+    inputs.joystick_2_btn = !joystick2.readBtn();
 
-    inputs_main.btn_1 = !InOut::ReadInput(PIN_MS_BTN_1);
-    inputs_main.btn_2 = !InOut::ReadInput(PIN_MS_BTN_2);
-    inputs_main.btn_3 = !InOut::ReadInput(PIN_MS_BTN_3);
-    inputs_main.btn_4 = !InOut::ReadInput(PIN_MS_BTN_4);
-    inputs_main.btn_5 = !InOut::ReadInput(PIN_MS_BTN_5);
-    inputs_main.btn_6 = !InOut::ReadInput(PIN_MS_BTN_6);
-    inputs_main.btn_7 = !InOut::ReadInput(PIN_MS_BTN_7);
-    inputs_main.btn_8 = !InOut::ReadInput(PIN_MS_BTN_8);
+    inputs.btn_1 = !InOut::ReadInput(PIN_MS_BTN_1);
+    inputs.btn_2 = !InOut::ReadInput(PIN_MS_BTN_2);
+    inputs.btn_3 = !InOut::ReadInput(PIN_MS_BTN_3);
+    inputs.btn_4 = !InOut::ReadInput(PIN_MS_BTN_4);
+    inputs.btn_5 = !InOut::ReadInput(PIN_MS_BTN_5);
+    inputs.btn_6 = !InOut::ReadInput(PIN_MS_BTN_6);
+    inputs.btn_7 = !InOut::ReadInput(PIN_MS_BTN_7);
+    inputs.btn_8 = !InOut::ReadInput(PIN_MS_BTN_8);
+    inputs_main = inputs;
     vTaskDelay(5); 
   }
 }
