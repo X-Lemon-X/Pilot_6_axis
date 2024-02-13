@@ -1,7 +1,7 @@
 from pynput import keyboard
 import threading
 import time
-from lemonx_receive import UDPReceiver, RemoteControler6D
+from lemonx_receive import RemoteControler6D
 import socket
 import argparse
 
@@ -137,19 +137,19 @@ def main():
   [KEYS MAPPING]
 
   ------------------------------------------------
-  - W: x axis of joystick 1
-  - S: x axis of joystick 1
-  - A: y axis of joystick 1
-  - D: y axis of joystick 1
-  - Q: z axis of joystick 1
-  - E: z axis of joystick 1
+  - W : x axis of joystick 1
+  - S : x axis of joystick 1
+  - A : y axis of joystick 1
+  - D : y axis of joystick 1
+  - Q : z axis of joystick 1
+  - E : z axis of joystick 1
   ------------------------------------------------
-  - Arrow up: x axis of joystick 2
-  - Arrow down: x axis of joystick 2
-  - Arrow left: y axis of joystick 2
-  - Arrow right: y axis of joystick 2
-  - [: z axis of joystick 2
-  - ]: z axis of joystick 2
+  - O : x axis of joystick 2
+  - L : x axis of joystick 2
+  - K : y axis of joystick 2
+  - ; : y axis of joystick 2
+  - i : z axis of joystick 2
+  - P : z axis of joystick 2
   ------------------------------------------------
   - Key 1: button 1
   - Key 2: button 2

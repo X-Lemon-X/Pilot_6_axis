@@ -14,6 +14,16 @@
 ![Image](images/pilot_2.png)
 ![Image](images/pilot_1.png)
 
+
+## Keyboard version
+ This repo also conatains pc keyboard version of this remote to test it without the need of the hardware.
+ ```
+  source .venv/bin/activate
+  python3 keyboard_rc.py -i IP_ADDRESS -p PORT -f FREQUENCY -v JOYSTICK_VALUE
+  or
+  python3 keyboard_rc.py -i IP_ADDRESS
+ ```
+
 ## Data frame
  Consist of 18 elements separated by ':'.
 Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned by joystick will vary. This setting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
