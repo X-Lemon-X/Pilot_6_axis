@@ -32,7 +32,7 @@ class KeyboardController:
       "5": False,
       "6": False,
       "7": False,
-      "8": False,
+      "space": False,
       "9": False,
       "0": False
     }
@@ -83,7 +83,7 @@ class KeyboardController:
     data.button_5 = int(self.key_pressed_map["5"])
     data.button_6 = int(self.key_pressed_map["6"])
     data.button_7 = int(self.key_pressed_map["7"])
-    data.button_8 = int(self.key_pressed_map["8"])
+    data.button_8 = int(self.key_pressed_map["space"])
     return data
 
   def start(self):
@@ -128,6 +128,16 @@ class KeyboardController:
     listener.stop()
     sock.close()
 
+def test():
+  keyboard_controller = KeyboardController("192.168.2.105",25000,50,0.5)
+  keyboard_controller.start()
+  while True:
+    try:
+      time.sleep(1)
+    except KeyboardInterrupt:
+      keyboard_controller.stop()
+      break
+                                           
 
 def main():
   desc = """\n[HELP]
@@ -158,7 +168,7 @@ def main():
   - Key 5: button 5
   - Key 6: button 6
   - Key 7: button 7
-  - Key 8: button 8
+  - Key space: button 8
   - Key 9: joystick 1 button
   - Key 0: joystick 2 button
   ------------------------------------------------
