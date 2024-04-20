@@ -442,7 +442,7 @@ bool ConnectWithAvailableWIfiNetwork()
         Println("");
         while (WiFi.status() != WL_CONNECTED) {
           Print(".");
-          delay(100);
+          delay(500);
           if(WIFI_CONNECTION_TRY_MAX_COUNT == connectionTryCount++) break;
         }
         
