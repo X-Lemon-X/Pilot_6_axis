@@ -2,6 +2,7 @@ import rclpy
 from rclpy.duration import Duration
 from rclpy.node import Node
 from sensor_msgs.msg import Joy
+from std_msgs.msg import Float64MultiArray
 from lemonx_receive import UDPReceiver, RemoteControler6D
 
 ###
@@ -12,9 +13,13 @@ class lemonJoyPublisher(Node):
     def __init__(self):
         super().__init__("lemonx_joy_publisher")
         self.publisher_ = self.create_publisher(Joy, "joy", 10)
+        self.gripper_pub = self.create_publisher(Float64MultiArray, "/velocity_controllers/commands", 10)
         timer_period = 0.1  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
+        self.gripper_msg = Float64MultiArray()
+        self.griper_open_close = 0.0
+        self.gripper_rotation = 0.0
         self.axes = [0.0] * 6  # Fill self.axes with a list of 6 float zeros
         self.buttons = [0] * 10  # Fill self.buttons with 10 zero integers
         self.conncected = False
@@ -32,6 +37,7 @@ class lemonJoyPublisher(Node):
             return 0.0
         return value
 
+    # This function is called when the UDPReceiver receives a message from the RC
     def handle_receive(self, data: RemoteControler6D):
         if not self.conncected:
             self.get_logger().info("Pilot connected")
@@ -54,6 +60,9 @@ class lemonJoyPublisher(Node):
         self.buttons[7] = data.button_6
         self.buttons[8] = data.button_7
         self.buttons[9] = data.button_8
+
+        self.griper_open_close = float(data.button_5 - data.button_6)
+        self.gripper_rotation = float(data.button_3 - data.button_4)
         self.get_logger().debug(str(data))
 
     def timer_callback(self):
@@ -67,14 +76,18 @@ class lemonJoyPublisher(Node):
         ):
             self.get_logger().warn("Pilot disconnected")
             self.conncected = False
+            self.gripper_msg.data[0] = self.griper_open_close
+            self.gripper_msg.data[1] = self.gripper_rotation
 
         if not self.conncected:
             self.axes = [0.0] * 6
             self.buttons = [0] * 10
 
+
         msg.axes = self.axes
         msg.buttons = self.buttons
         self.publisher_.publish(msg)
+        self.gripper_pub.publish(self.gripper_msg)
 
 
 def main(args=None):

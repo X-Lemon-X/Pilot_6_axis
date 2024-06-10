@@ -40,7 +40,7 @@ class UDPReceiver:
 
 
 class RemoteControler6D:
-  def __init__(self,signal_frequency: float = 0.0,bytes_data: str =None):
+  def __init__(self,bytes_data: str =None,signal_frequency: float = 0.0):
     if bytes_data is not None:
       self.__init__from_bytes(bytes_data,signal_frequency)
     else:
