@@ -31,10 +31,10 @@
 //----------------------IMPORTANT----BUILDING
 
 // #define SAVE_TO_FLASH  // only use once to save new setings to flash -> Flush ESP32 with it uncomented then Flush again without it //newer work with it uncommented or it will break EPPROM 
-#define DEBUG
+// #define DEBUG
 
 //-----------------------------INFO
-#define VERSION 2.3
+#define VERSION 2.5
 
 
 
@@ -80,12 +80,18 @@ int lineCount=0;
 
 //-----------------------------WIFI_SETUP
 #define WIFI_SETINGS_BEG_NAME "str_WIFI_"
-#define WIFI_CONNECTION_TRY_MAX_COUNT 10
+#define WIFI_CONNECTION_TRY_MAX_COUNT 20
 #define WIFI_PASSWORD_LENGTH 15
+#define WIFI_NETWORKS_MAX 6
 const char* WIFI_NAME = "remocon";
 uint8_t newMACAddress[] = {0xA0, 0x46, 0x2A, 0x7A, 0x68, 0x36}; //A0-46-2A-7A-68-36
+IPAddress access_poin_ip(192, 168, 50, 1);
+IPAddress access_poin_gateway(192, 168, 50, 1);
+IPAddress access_poin_subnet(255, 255, 255, 0);
 const char* ssid     = "RC_6D";
 std::string WIFIpasssword="123456789";
+
+std::pair<String,String> wifi_settings[WIFI_NETWORKS_MAX];
 
 //-----------------------------UDP
 #define UDP_BEGIN "$RC:"
@@ -249,6 +255,15 @@ void LoadSetings()
     setings_data.SaveSetingsToFlash();
   #endif
   setings_data.LoadSetingsFromFlash();
+
+
+  wifi_settings[0] = std::pair<String,String>(setings_data.GetSeting("str_WIFI_1_S").data._string,setings_data.GetSeting("str_WIFI_1_P").data._string);
+  wifi_settings[1] = std::pair<String,String>(setings_data.GetSeting("str_WIFI_2_S").data._string,setings_data.GetSeting("str_WIFI_2_P").data._string);
+  wifi_settings[2] = std::pair<String,String>(setings_data.GetSeting("str_WIFI_3_S").data._string,setings_data.GetSeting("str_WIFI_3_P").data._string);
+  wifi_settings[3] = std::pair<String,String>(setings_data.GetSeting("str_WIFI_4_S").data._string,setings_data.GetSeting("str_WIFI_4_P").data._string);
+  wifi_settings[4] = std::pair<String,String>(setings_data.GetSeting("str_WIFI_5_S").data._string,setings_data.GetSeting("str_WIFI_5_P").data._string);
+  wifi_settings[5] = std::pair<String,String>(setings_data.GetSeting("str_WIFI_6_S").data._string,setings_data.GetSeting("str_WIFI_6_P").data._string);
+
 }
 
 void GPIOinit()
@@ -321,6 +336,8 @@ void InitAllWebEvents()
   #endif
 
   WiFi.mode(WIFI_AP);
+  // WiFi.softAPConfig(apIP, gateway, subnet);
+  WiFi.softAPConfig(access_poin_ip, access_poin_gateway, access_poin_subnet);
   WiFi.softAP(ssid, wifipw);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -366,27 +383,12 @@ void InitAllWebEvents()
 
 #pragma endregion
 
-bool FindWifiNetwork(String ssid, String *password, int *num)
+int FindWifiNetwork(String ssid)
 {
-  for(auto elemnt=setings_data._setings.begin(); elemnt!=setings_data._setings.end(); elemnt++ )
-  {
-    std::string beg = elemnt->first ;
-    beg.resize(9);
-    if(beg ==  WIFI_SETINGS_BEG_NAME)
-    {
-      //Println("Name:" + String(elemnt->first.c_str()) + " val:" + String(elemnt->second.data._string));
-      *num = std::stoi(elemnt->first.substr(9,1));
-      std::string type = elemnt->first.substr(elemnt->first.size()-1,1);
-      if(type == "S" && std::string(elemnt->second.data._string) == std::string(ssid.c_str()))
-      {
-        std::string name = elemnt->first.substr(0,11) + "P";
-        auto ss = setings_data._setings[name];
-        *password = String(ss.data._string);
-        return true;
-      }
-    }
+  for (int i = 0; i < WIFI_NETWORKS_MAX; i++){
+    if(wifi_settings[i].first == ssid) return i;
   }
-  return false;
+  return -1;
 }
 
 bool ConnectWithAvailableWIfiNetwork()
@@ -395,72 +397,50 @@ bool ConnectWithAvailableWIfiNetwork()
   esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
   WiFi.disconnect();
   bool notConnected=true;
+  bool available[WIFI_NETWORKS_MAX];
+  for (size_t i = 0; i < WIFI_NETWORKS_MAX; i++) available[i]=false;
+  WiFi.scanNetworks();
 
-  String wifi[10][2];
-  bool available[10];
-
-  for (size_t i = 0; i < 10; i++)
-  {
-    available[i]=false;
-    wifi[i][0]="";
-    wifi[i][1]="";
-  }
-  
   while (notConnected)
   {
     int i = WiFi.scanNetworks();
     if(i<=0){
-      delay(50);
+      delay(500);
       continue;
     }
-  
-    for (int count = 0; count < i; count++)
-    {        
-      String passwd;
+    
+    for (int count = 0; count < i; count++){        
       String ssid= WiFi.SSID(count);
-      Println("CH?:"+ssid);
-      int num=0;
-      if(FindWifiNetwork(ssid,&passwd,&num))
-      {  
-        Println("Available");
-        available[num]= true;
-        wifi[num][0] = ssid;
-        wifi[num][1] = passwd;
-      }
+      Println("?:"+ssid);
+      int num = FindWifiNetwork(ssid);
+      if(num != -1) available[num]= true;
     } 
 
-    for (size_t i = 0; i < 10; i++)
-    {
-      //Println("CH? num"  + String(i));
-      if(available[i])
-      {
-        // Println("ss:"+wifi[i][0]);
-        // Println("pa:"+wifi[i][1]);
-        WiFi.begin(wifi[i][0].c_str(), wifi[i][1].c_str());
-        int connectionTryCount=0;
-        
-        Println("");
-        while (WiFi.status() != WL_CONNECTED) {
-          Print(".");
-          delay(500);
-          if(WIFI_CONNECTION_TRY_MAX_COUNT == connectionTryCount++) break;
-        }
-        
-        if(WiFi.status() == WL_CONNECTED){
-          Println("Connected to:");
-          Println(wifi[i][0]);
-          // Println(WiFi.localIP().toString());
-          Println("Sending data to:");
-          Println(setings_data.GetSeting("str_host_wifi").data._string);
-          Println("Port:");
-          Print(String(setings_data.GetSeting("int_host_port").data._int));
-          notConnected = false;
-          break;
-        }
+    for (size_t i = 0; i < WIFI_NETWORKS_MAX; i++){
+      if(!available[i]) continue;
+      Println("Connecting to:");
+      Println(wifi_settings[i].first);
+      WiFi.begin(wifi_settings[i].first.c_str(), wifi_settings[i].second.c_str());
+      int connectionTryCount=0;
+      Println("");
+      delay(500);
+      while (WiFi.status() != WL_CONNECTED && WIFI_CONNECTION_TRY_MAX_COUNT != connectionTryCount++) {
+        Print(".");
+        delay(500);
       }
-    }
-  
+
+      if(WiFi.status() == WL_CONNECTED){
+        Println("Connected to:");
+        Println(wifi_settings[i].first);
+        Println("Sending to:");
+        Println(setings_data.GetSeting("str_host_wifi").data._string);
+        Println("Port:");
+        Print(String(setings_data.GetSeting("int_host_port").data._int));
+        notConnected = false;
+        break;
+      }
     
+    }
   }
   return !notConnected;
 }
@@ -468,14 +448,14 @@ bool ConnectWithAvailableWIfiNetwork()
 void WaitForConnection(){
   wl_status_t statusPrev=WL_IDLE_STATUS;
   while(true){
-    wl_status_t status =  WiFi.status();
-    if(status!= statusPrev ){
-      if(status != WL_CONNECTED){ 
-        Println("disconnected");
-        Wifi_Connected = ConnectWithAvailableWIfiNetwork();
-      }
+    wl_status_t status = WiFi.status();
+    vTaskDelay(100);
+    if(status == statusPrev ) continue;
+    if(status != WL_CONNECTED){ 
+      Println("disconnected");
+      Wifi_Connected = ConnectWithAvailableWIfiNetwork();
     }
-    statusPrev = status;
+    statusPrev = WiFi.status();
   }
 }
 
@@ -483,7 +463,7 @@ void InitSetupMode()
 {
   InitAllWebEvents();
   Println("--Setup mode--");
-  Println("http://192.168.4.1");
+  Println("http://" + WiFi.softAPIP().toString());
   Println("sd:");
   Println(String(ssid));
   Println("pw:");
@@ -578,11 +558,11 @@ void Task_SendUDP_data(void *param)
 
 void Task_Conenct_to_Wifi(void *param)
 {
-  while (1)
-  {
-    WaitForConnection(); 
-    vTaskDelay(50);
-  }
+  WaitForConnection(); 
+  // while (1)
+  // {
+  //   vTaskDelay(50);
+  // }
   
 }
 
