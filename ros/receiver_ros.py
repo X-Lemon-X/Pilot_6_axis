@@ -18,7 +18,7 @@ class lemonJoyPublisher(Node):
     self.get_logger().info(f"Joy topic: {joy_topic}")
 
 
-    self.publisher_ = self.create_publisher(Joy, "joy", 10)
+    self.publisher_ = self.create_publisher(Joy, joy_topic , 10)
     # self.gripper_pub = self.create_publisher(Float64MultiArray, "/controls/joy_velocity", 10)
     timer_period = 0.1  # seconds
     self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -47,7 +47,7 @@ class lemonJoyPublisher(Node):
     value = value / self.analog_divider
     if value < self.max_zero_position and value > -self.max_zero_position:
         return 0.0
-    return value
+    return float(value)
 
   # This function is called when the UDPReceiver receives a message from the RC
   def handle_receive(self, data: RemoteControler6D):
