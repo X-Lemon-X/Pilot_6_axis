@@ -55,5 +55,6 @@
         "cinttypes": "cpp"
     },
     "stm32-for-vscode.openOCDPath": false,
-    "cmake.sourceDirectory": "/home/lemonx/it/Pilot_6_axis/pilot/.pio/libdeps/esp32doit-devkit-v1/AsyncTCP-esphome"
+    "cmake.sourceDirectory": "/home/lemonx/it/Pilot_6_axis/pilot/.pio/libdeps/esp32doit-devkit-v1/AsyncTCP-esphome",
+    "ros.distro": "humble"
 }
