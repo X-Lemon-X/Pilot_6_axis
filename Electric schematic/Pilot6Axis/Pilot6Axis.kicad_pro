@@ -48,7 +48,7 @@
         "silk_text_thickness": 0.15,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.5
+          "min_clearance": 0.12
         }
       },
       "diff_pair_dimensions": [
@@ -63,7 +63,14 @@
           "width": 0.3
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        "hole_clearance|148950000|119315000|12cf513b-216c-4ffc-825a-6dfcce664851|e8806760-dbb2-4e35-9fd6-c3d71c6c6fbf",
+        "hole_clearance|148950000|119315000|ae18cdf9-8a7e-4837-8c87-7826b3c5c80b|e8806760-dbb2-4e35-9fd6-c3d71c6c6fbf",
+        "hole_clearance|155050000|119315000|6624d42e-a4af-417b-9d8d-4ad9feb64986|57975495-6ff6-46ae-a0bc-45f4a8cb3af1",
+        "hole_clearance|155050000|119315000|75a39294-c71c-459a-bebb-dc9deda76c41|57975495-6ff6-46ae-a0bc-45f4a8cb3af1",
+        "hole_near_hole|148740000|120840000|a7aa8b72-baf8-47a7-b7f0-713447b75e93|e8806760-dbb2-4e35-9fd6-c3d71c6c6fbf",
+        "hole_near_hole|149110000|119955000|e8806760-dbb2-4e35-9fd6-c3d71c6c6fbf|a7aa8b72-baf8-47a7-b7f0-713447b75e93"
+      ],
       "meta": {
         "version": 2
       },
@@ -103,7 +110,7 @@
         "shorting_items": "error",
         "silk_edge_clearance": "warning",
         "silk_over_copper": "warning",
-        "silk_overlap": "warning",
+        "silk_overlap": "ignore",
         "skew_out_of_range": "error",
         "solder_mask_bridge": "error",
         "starved_thermal": "error",
@@ -192,7 +199,8 @@
         0.5,
         0.65,
         0.75,
-        1.0
+        1.0,
+        2.54
       ],
       "tuning_pattern_settings": {
         "diff_pair_defaults": {
@@ -483,6 +491,23 @@
         "via_diameter": 0.8,
         "via_drill": 0.4,
         "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.2,
+        "diff_pair_gap": 0.4,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.127,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "USB",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.127,
+        "via_diameter": 0.8,
+        "via_drill": 0.4,
+        "wire_width": 6
       }
     ],
     "meta": {
@@ -490,7 +515,20 @@
     },
     "net_colors": null,
     "netclass_assignments": null,
-    "netclass_patterns": []
+    "netclass_patterns": [
+      {
+        "netclass": "USB",
+        "pattern": "/USB/D+"
+      },
+      {
+        "netclass": "USB",
+        "pattern": "/USB/D-"
+      },
+      {
+        "netclass": "USB",
+        "pattern": "/USB/USB*"
+      }
+    ]
   },
   "pcbnew": {
     "last_paths": {
@@ -609,6 +647,22 @@
     [
       "085b8362-a5df-4186-a09b-4280628dd4a5",
       "Root"
+    ],
+    [
+      "504d928c-edb5-470d-96cf-de0a899dce19",
+      "Power"
+    ],
+    [
+      "a7ac3328-b052-491e-9658-5f9d26ef4a49",
+      "USB"
+    ],
+    [
+      "91c3df2c-6b6b-4e87-a952-2ca002d375c3",
+      "MCU"
+    ],
+    [
+      "120c4459-9f59-48b6-a13b-e8316692e798",
+      "CHARGER"
     ]
   ],
   "text_variables": {}
