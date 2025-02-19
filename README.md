@@ -15,17 +15,23 @@
 
 ## The repo supports demo pc keyboard version of the RC 
  Pc keyboard version for RC without the need for the hardware.
- ```
+ 
+ ```bash
   python3 -m venv .venv
   python3 -m pip -r requirements.txt
   source .venv/bin/activate
-  python3 keyboard_rc.py -i IP_ADDRESS -p PORT -f FREQUENCY -v JOYSTICK_VALUE
+  python3 ros/keyboard_rc.py -i IP_ADDRESS -p PORT -f FREQUENCY -v JOYSTICK_VALUE
  ```
+for help
+```bash
+  python3 ros/keyboard_rc.py
+ ```
+
 
 ## Data frame
  Consist of 18 elements separated by ':'.
 Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned by joystick will vary. This setting values should be between -9999<=x<=9999 or 0<=x<=99999 or the data frame length won't be constant, for buttons: 1-pressed 0-not pressed.
-```
+```bash
  Example: "$Rc:  340:   200:   12:1:  500:-2045: 2045:1:1:1:0:1:1:0:1:0:#\r"
 ```
 
