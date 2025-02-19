@@ -1,27 +1,25 @@
-## Simple Remote Controler
+# 6 axis remote Controler
 - Works over Wi-Fi ( sends constant length ASCI data frame)
-- With up to 6 networks saved (with priority from  1 to 6)
-- All settings of the Rc can be changed on a website
+- Up to 6 networks saved (with priority from  1 to 6)
+- All settings of the Rc can be changed on a configuration website
 - Controled inertia of the joysticks and signal values of the joystick coordinates
 - Veriable signal refresh rate up to 200Hz
 - Auto zero positioning (no more robots moving in slow speed without touching the pilot)
 - USB-C charged!
-- 3-DOF joysticks
-- 10 buttons (2 of which are on JS)
+- two 3-DOF joysticks
+- 10 buttons (2 of which are on Joy Sticks)
 - Integrated LCD
-- Rc remembers settings so no need to set it up every time or reprogram it.
+- The RC remembers settings so no need to set it up every time or reprogram it.
 
 ![Image](images/pilot_2.png)
-![Image](images/pilot_1.png)
 
-
-## Keyboard version
- This repo also conatains pc keyboard version of this remote to test it without the need of the hardware.
+## The repo supports demo pc keyboard version of the RC 
+ Pc keyboard version for RC without the need for the hardware.
  ```
+  python3 -m venv .venv
+  python3 -m pip -r requirements.txt
   source .venv/bin/activate
   python3 keyboard_rc.py -i IP_ADDRESS -p PORT -f FREQUENCY -v JOYSTICK_VALUE
-  or
-  python3 keyboard_rc.py -i IP_ADDRESS
  ```
 
 ## Data frame
@@ -77,9 +75,10 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
 
 
 ## Required component list
+- Components are in BOM file "Electric schematic/Pilot6Axis/jlcpcb/production_files/BOM-Pilot6Axis.csv"
 
-- ESP32 DevKit V4 SP32-WROOM-32U
-  ![ESP32 DevKit V4](images/esp32_devkit_v4_small.png)
+- From JLCB order the pcb "Electric schematic/Pilot6Axis/jlcpcb/production_files/GERBER-Pilot6Axis.zip"
+  ![PCB](images/pcb.png)
 
 - Joystick 4-axis JH-D400B-M4
   ![Joystick 4-axis JH-D400B-M4](images/joystick.png)
@@ -92,12 +91,6 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
 
 - Li-ion battery 606090 3.7V 4000mAh
   ![Li-ion battery 3.7V](images/li_ion_battery_small.jpg)
-
-- USB-C 1S charger
-  ![USB-C 1S charger](images/usb_c_charger_small.png)
-
-- Step up converter from li-ion to 5V
-  ![Step up converter](images/step_up_converter_small.png)
 
 - LCD 1.3" 128x64 OLED SSD1306
   ![LCD 1.3" 128x64 OLED SSD1306](images/lcd_small.png)
@@ -113,7 +106,6 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
 
 - M3 5mm hex socket cylindrical  X5 
   ![M3 screws](images/m3_screws_small_cyl.png)
-
 
 ## How to assembly
   You figure it out.
