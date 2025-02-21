@@ -13,7 +13,7 @@ class lemonJoyPublisher(Node):
     super().__init__("lemonx_joy_publisher")
     # parameters to set topic where the joy message will be published
 
-    self.declare_parameter("pilot_six_axis_joy_topic", "joy")
+    self.declare_parameter("pilot_six_axis_joy_topic", "/sdrac/joy")
     joy_topic = self.get_parameter("pilot_six_axis_joy_topic").value
     self.get_logger().info(f"Joy topic: {joy_topic}")
 
