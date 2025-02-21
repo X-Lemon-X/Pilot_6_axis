@@ -5341,7 +5341,7 @@
 		(descr "Resistor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R20"
-			(at 2.5 0 360)
+			(at 2.5 0 0)
 			(layer "F.SilkS")
 			(uuid "5fa4a3a8-088b-4829-b487-a09ea4c8a490")
 			(effects
@@ -5352,7 +5352,7 @@
 			)
 		)
 		(property "Value" "4k7"
-			(at 0 1.17 360)
+			(at 0 1.17 0)
 			(layer "F.Fab")
 			(uuid "e9ac756b-be18-425e-b760-f27a1c195c6b")
 			(effects
@@ -5520,7 +5520,7 @@
 			(uuid "fc7fd455-9135-4c4d-b8d4-091d8adc688b")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "d16d7bec-3c45-49bb-b6d6-bd9031bbeb1c")
 			(effects
@@ -17312,7 +17312,7 @@
 		(descr "Resistor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R19"
-			(at 2.25 0 360)
+			(at 2.25 0 0)
 			(layer "F.SilkS")
 			(uuid "686453e4-9d0d-418e-a8e0-8d9898dbda01")
 			(effects
@@ -17323,7 +17323,7 @@
 			)
 		)
 		(property "Value" "4k7"
-			(at 0 1.17 360)
+			(at 0 1.17 0)
 			(layer "F.Fab")
 			(uuid "d83167dc-ae5c-47a9-9001-2ea61bdff5f1")
 			(effects
@@ -17491,7 +17491,7 @@
 			(uuid "3ce10646-f5ad-4217-acc8-7d62d946fc17")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "652c5ad7-4c96-4b4d-ab0f-2d04b083415b")
 			(effects
@@ -22428,6 +22428,40 @@
 		)
 	)
 	(gr_line
+		(start 162.7287 101.630801)
+		(end 162.728699 109.1308)
+		(stroke
+			(width 0.2)
+			(type default)
+		)
+		(layer "B.SilkS")
+		(uuid "4fb2a8e4-dd34-4180-bbc9-e09001e4f4b2")
+	)
+	(gr_poly
+		(pts
+			(xy 167.761201 101.6308) (xy 167.7612 109.1308) (xy 157.696199 109.130801) (xy 157.6962 101.630801)
+		)
+		(stroke
+			(width 0.3)
+			(type default)
+		)
+		(fill none)
+		(layer "B.SilkS")
+		(uuid "581a7259-6031-48c7-a7ef-34cf61507e8f")
+	)
+	(gr_poly
+		(pts
+			(xy 187.290791 101.6308) (xy 187.290791 109.1308) (xy 167.6962 109.130801) (xy 167.6962 101.630801)
+		)
+		(stroke
+			(width 0.3)
+			(type default)
+		)
+		(fill none)
+		(layer "B.SilkS")
+		(uuid "e16014ce-b13e-410d-9aec-00b22e86afc9")
+	)
+	(gr_line
 		(start 187.0612 71.6308)
 		(end 117.0612 71.6308)
 		(stroke
@@ -22554,6 +22588,55 @@
 		)
 		(layer "Edge.Cuts")
 		(uuid "c5c7c90e-8d7f-4c01-8af6-dac14c425373")
+	)
+	(gr_text "Pilot 6 axis\ndesigned by Patryk Dudziński\nREV1.0    21.02.2025"
+		(at 186.478699 106.9308 0)
+		(layer "B.SilkS")
+		(uuid "3beb9196-7d92-4cd4-9d60-34e33cc64971")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.2)
+				(bold yes)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "S/N"
+		(at 162.728699 103.030799 -0)
+		(layer "B.SilkS" knockout)
+		(uuid "7d48806e-fa9b-414d-997d-c1b95add9ee8")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "QC"
+		(at 167.678699 103.0508 -0)
+		(layer "B.SilkS" knockout)
+		(uuid "7e5fb572-e9fe-4479-b5c4-fe5ad4f41576")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "github.com/X-Lemon-X/Pilot_6_axis"
+		(at 167.7612 73.6308 0)
+		(layer "B.SilkS")
+		(uuid "94c464e9-b5d8-42f3-9a28-c94aae61fd57")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom mirror)
+		)
 	)
 	(gr_text "GND"
 		(at 171.1 120.2 -90)
