@@ -104,31 +104,3 @@ class RemoteControler6D:
       f"{self.button_6}:{self.button_7}:{self.button_8}:#\r"
     )
     return package.encode("ascii")
-    
-
-def print_data(data: RemoteControler6D):
-  print(data)
-
-def test_remote():
-  receiver = UDPReceiver(25000)
-  receiver.start()
-  receiver.on_receive(print_data)
-  while True:
-      time.sleep(1)
-
-def test_remote_send():
-  UDP_IP = "192.168.2.105"  # Replace with the IP address of the destination
-  UDP_PORT = 25000
-
-  sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  while True:
-    data = (
-      f"$RC:{int(random.random() * 100000)}:  -13:  -11:1:  -11:   -9:  "
-      " -4:1:1:1:1:1:1:1:1:1:#\r"
-    )
-    sock.sendto(data.encode("ascii"), (UDP_IP, UDP_PORT))
-    print(data)
-    time.sleep(0.5)
-
-if __name__ == "__main__":
-  test_remote()
