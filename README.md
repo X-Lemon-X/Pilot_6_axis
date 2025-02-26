@@ -20,12 +20,19 @@
   python3 -m venv .venv
   python3 -m pip -r requirements.txt
   source .venv/bin/activate
-  python3 ros/keyboard_rc.py -i IP_ADDRESS -p PORT -f FREQUENCY -v JOYSTICK_VALUE
+  python3 pilot_6axis/pilot_6axis/keyboard_rc.py -i IP_ADDRESS -p PORT -f FREQUENCY -v JOYSTICK_VALUE
  ```
 for help
 ```bash
-  python3 ros/keyboard_rc.py
+  python3 pilot_6axis/pilot_6axis/keyboard_rc.py
  ```
+
+## To build and run ros package
+```bash
+  colcon build --packages-select pilot_6axis
+  source install/setup.bash 
+  ros2 run pilot_6axis rc_node
+```
 
 
 ## Data frame
