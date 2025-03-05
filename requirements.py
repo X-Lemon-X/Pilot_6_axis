@@ -1,4 +1,0 @@
-evdev==1.9.0
-pynput==1.7.7
-python-xlib==0.33
-six==1.17.0
