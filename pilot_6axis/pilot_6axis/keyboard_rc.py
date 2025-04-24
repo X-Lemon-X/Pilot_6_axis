@@ -1,7 +1,7 @@
 from pynput import keyboard
 import threading
 import time
-from lemonx_receive import RemoteControler6D
+from rc_receive import RemoteControler6D
 import socket
 import argparse
 
