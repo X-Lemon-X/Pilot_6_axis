@@ -4,7 +4,7 @@
   <name>pilot_6axis</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="dudzinski.patryk.02@gmail.com">lemonx</maintainer>
+  <maintainer email="dudzinski.patryk.02@gmail.com">Patryk Dudziński</maintainer>
   <license>MIT</license>
 
   <test_depend>ament_copyright</test_depend>

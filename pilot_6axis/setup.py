@@ -13,7 +13,7 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='lemonx',
+    maintainer='Patryk Dudziński',
     maintainer_email='dudzinski.patryk.02@gmail.com',
     description='6 axis remote Controler',
     license='MIT',
