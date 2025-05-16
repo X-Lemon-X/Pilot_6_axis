@@ -1,7 +1,3 @@
-#pragma once
-
-
-const char MAIN_page_style[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -159,40 +155,7 @@ const char MAIN_page_style[] PROGMEM = R"rawliteral(
   </style>
 </head>
 <body>
-)rawliteral";
 
-const char SETTING_page_end[] PROGMEM = R"rawliteral(
-  <button onclick="window.location.href='/'" class="back-btn" style="display:inline-block;margin:1em auto 2em auto;padding:0.7em 2em;font-size:1em;font-weight:bold;color:#0bcfe4;background:#232323;border:none;border-radius:0.5em;box-shadow:0 0.1em 0.3em rgba(11,207,228,0.12);text-decoration:none;transition:background 0.2s, color 0.2s;cursor:pointer;">
-    &larr; Back
-  </button>
-  <script>
-    setTimeout(function() {
-      window.location.href = '/';
-    }, 3000);
-  </script>
-
-</body>
-</html>
-
-)rawliteral";
-
-const char MAIN_table_separator[] PROGMEM = R"rawliteral(
-       
-<tr>
-  <td colspan="2" class="section-header">
-    <span>WIFI target networks</span>
-  </td>
-</tr>
-
-<tr>
-  <td colspan="2" style="text-align:right;">
-    <button type="button" class="show-password-btn" onclick="toggleAllPasswords(this)">Show Passwords</button>
-  </td>
-</tr>
-
-)rawliteral";
-
-const char MAIN_page_beg[] PROGMEM = R"rawliteral(
   <h2>Remote Controller 6D</h2>
   <form action="/get">
     <table>
@@ -203,9 +166,54 @@ const char MAIN_page_beg[] PROGMEM = R"rawliteral(
           </td>
         </tr>
 
-)rawliteral";
 
-const char MAIN_page_end[] PROGMEM = R"rawliteral(
+        <tr><td>Joystick left MMin</td><td><input type="text" name="int_Joystick_left_MMin" value=""></td></tr>
+        <tr><td>Joystick left MMax</td><td><input type="text" name="int_Joystick_left_MMax" value=""></td></tr>
+        <tr><td>Joystick right MMin</td><td><input type="text" name="int_Joystick_right_MMin" value=""></td></tr>
+        <tr><td>Joystick right MMax</td><td><input type="text" name="int_Joystick_right_MMax" value=""></td></tr>
+        <tr><td>Joystick left filer</td><td><input type="text" name="flo_Joystick_left_filer" value=""></td></tr>
+        <tr><td>Joystick right filer</td><td><input type="text" name="flo_Joystick_right_filer" value=""></td></tr>
+        <tr><td>Host Port</td><td><input type="text" name="int_host_port" value=""></td></tr>
+        <tr><td>Update frequency</td><td><input type="text" name="int_upd_freq" value=""></td></tr>
+        <tr><td>WIFI SSID</td><td><input type="text" name="str_ssid" value=""></td></tr>
+        <tr><td>WIFI PASSWORD</td><td><input type="text" name="str_passwd" value=""></td></tr>
+        <tr><td>Target IP</td><td><input type="text" name="str_target_ip" value=""></td></tr>
+       
+       
+        <tr>
+          <td colspan="2" class="section-header">
+            <span>WIFI target networks</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="2" style="text-align:right;">
+            <button type="button" class="show-password-btn" onclick="toggleAllPasswords(this)">Show Passwords</button>
+          </td>
+        </tr>
+
+        <tr><td>Wifi 1: Seed</td><td><input type="text" name="str_WIFI_1_S" value=""></td></tr>
+        <tr><td>Wifi 1: Password</td><td><input type="password" id="wifipass" name="str_WIFI_1_P" value="asdf" class="password-input"></td></tr>
+        <tr><td>Wifi 2: Seed</td><td><input type="text" name="str_WIFI_2_S" value=""></td></tr>
+        <tr><td>Wifi 2: Password</td><td><input type="password" id="wifipass" name="str_WIFI_2_P" value="" class="password-input"></td></tr>
+        <tr><td>Wifi 3: Seed</td><td><input type="text" name="str_WIFI_3_S" value=""></td></tr>
+        <tr><td>Wifi 3: Password</td><td><input type="password" id="wifipass" name="str_WIFI_3_P" value="" class="password-input"></td></tr>
+        <tr><td>Wifi 4: Seed</td><td><input type="text" name="str_WIFI_4_S" value=""></td></tr>
+        <tr><td>Wifi 4: Password</td><td><input type="password" id="wifipass" name="str_WIFI_4_P" value="" class="password-input"></td></tr>
+        <tr><td>Wifi 5: Seed</td><td><input type="text" name="str_WIFI_5_S" value=""></td></tr>
+        <tr><td>Wifi 5: Password</td><td><input type="password" id="wifipass" name="str_WIFI_5_P" value="" class="password-input"></td></tr>
+        <tr><td>Wifi 6: Seed</td><td><input type="text" name="str_WIFI_6_S" value=""></td></tr>
+        <tr><td>Wifi 6: Password</td><td><input type="password" id="wifipass" name="str_WIFI_6_P" value="" class="password-input"></td></tr>
+        <tr><td>Wifi 7: Seed</td><td><input type="text" name="str_WIFI_7_S" value=""></td></tr>
+        <tr><td>Wifi 7: Password</td><td><input type="password" id="wifipass" name="str_WIFI_7_P" value="" class="password-input"></td></tr>
+        <tr><td>Wifi 8: Seed</td><td><input type="text" name="str_WIFI_8_S" value=""></td></tr>
+        <tr><td>Wifi 8: Password</td><td><input type="password" id="wifipass" name="str_WIFI_8_P" value="" class="password-input"></td></tr>
+        <tr><td>Wifi 9: Seed</td><td><input type="text" name="str_WIFI_9_S" value=""></td></tr>
+        <tr><td>Wifi 9: Password</td><td><input type="password" id="wifipass" name="str_WIFI_9_P" value="" class="password-input"></td></tr>
+        <tr><td>Wifi 10: Seed</td><td><input type="text" name="str_WIFI_10_S" value=""></td></tr>
+        <tr><td>Wifi 10: Password</td><td><input type="password" id="wifipass" name="str_WIFI_10_P" value="" class="password-input"></td></tr>
+
+
         <script>
           function toggleAllPasswords(btn) {
             var show = btn.textContent === "Show Passwords";
@@ -227,5 +235,3 @@ const char MAIN_page_end[] PROGMEM = R"rawliteral(
   </form>
 </body>
 </html>
-
-)rawliteral";
