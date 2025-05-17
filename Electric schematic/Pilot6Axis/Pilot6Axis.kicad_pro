@@ -81,11 +81,15 @@
           ""
         ],
         [
-          "hole_near_hole|148740000|120840000|a7aa8b72-baf8-47a7-b7f0-713447b75e93|e8806760-dbb2-4e35-9fd6-c3d71c6c6fbf",
+          "unconnected_items|147680000|119455000|3dd47ed9-d695-4815-a16e-44d331623114|3fe6f67e-20ff-490f-b83f-643a5a0fb01c",
           ""
         ],
         [
-          "hole_near_hole|149110000|119955000|e8806760-dbb2-4e35-9fd6-c3d71c6c6fbf|a7aa8b72-baf8-47a7-b7f0-713447b75e93",
+          "unconnected_items|147680000|123635000|3fe6f67e-20ff-490f-b83f-643a5a0fb01c|b2b5eb68-dd3b-41c8-b3d2-70a1ef9ed198",
+          ""
+        ],
+        [
+          "unconnected_items|157701200|120860800|1e8c87bc-8b9e-4acc-a07f-35b40c7e92b5|b2b5eb68-dd3b-41c8-b3d2-70a1ef9ed198",
           ""
         ]
       ],
@@ -159,7 +163,7 @@
         "min_copper_edge_clearance": 0.2,
         "min_groove_width": 0.0,
         "min_hole_clearance": 0.25,
-        "min_hole_to_hole": 0.5,
+        "min_hole_to_hole": 0.2,
         "min_microvia_diameter": 0.25,
         "min_microvia_drill": 0.15,
         "min_resolved_spokes": 2,
@@ -516,7 +520,7 @@
     "classes": [
       {
         "bus_width": 12,
-        "clearance": 0.2,
+        "clearance": 0.12,
         "diff_pair_gap": 0.25,
         "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -536,7 +540,6 @@
         "bus_width": 12,
         "clearance": 0.2,
         "diff_pair_gap": 0.4,
-        "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.127,
         "line_style": 0,
         "microvia_diameter": 0.3,
@@ -704,8 +707,8 @@
       "MCU"
     ],
     [
-      "120c4459-9f59-48b6-a13b-e8316692e798",
-      "CHARGER"
+      "53200cc9-36ae-481d-b1ee-e4ac6bfba1fc",
+      "PD"
     ]
   ],
   "text_variables": {}

@@ -126,7 +126,6 @@ void PrintInfo() {
 
 void LoadSetings() {
 
-#pragma endregion
 
   // we load some default values to the settings
   rc_settings.int_Joystick_left_MMin   = -2048;

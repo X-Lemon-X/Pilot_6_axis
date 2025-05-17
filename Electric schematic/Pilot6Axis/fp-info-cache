@@ -1,4 +1,4 @@
-25813721011781302
+25818963305770982
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -103445,6 +103445,27 @@ Varistor VF
 0
 2
 2
+parts
+BQ25792RQMR
+RQM0029A
+Integrated Circuit
+0
+33
+33
+parts
+QFN40P400X400X100-33N-D
+RSM0032B_2024
+Integrated Circuit
+0
+33
+33
+parts
+TPS25750DRJKR
+TPS25750DRJKR-2
+Integrated Circuit
+0
+44
+44
 parts
 TS1088R02026
 TS-1088R-02026-1
