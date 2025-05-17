@@ -70,55 +70,57 @@ Depending on the settings int_Joystick_(left/right)_(MMin/MMax) value returned b
   5. To leave setup mode shut down the Rc and turn it on again.
   6. Now the Rc will connect to the network with the highest priority that is available. If it can't connect to any of the saved networks it will keep trying to connect to them. If the Rc is connected to the network it will display the IP address on the LCD and show Connected status.
   7. Now setup is done and you can use the Rc.
-### Settings explained
-  - int_Joystick_left_MMin -> minimum value of the left joystick  x,y,z axis on the min of the range 
-  - int_Joystick_left_MMax -> maximum value of the left joystick  x,y,z axis on the max of the range
-  - flo_Joystick_left_filer -> inertia of the left joystick (0-1), the higher inertia the response of the joystick value will be faster.
-  - int_Joystick_right_MMin -> minimum value of the right joystick  x,y,z axis on the min of the range
-  - int_Joystick_right_MMax -> maximum value of the right joystick  x,y,z axis on the max of the range
-  - flo_Joystick_right_filer  -> inertia of the right joystick (0-1)
-  - int_upd_freq  => frequency of sending data frame
-  - str_host_wifi => IP address to whitch the Rc will send data frame
-  - str_host_port => port to whitch the Rc will send data frame
-  - str_passwd  =>  password of the wifi network made by the the Rc in setup mode
-  - str_WIFI_(number 1-6)_S =>  SSID of the wifi network      (where number means priority from 1 to 6)
-  - str_WIFI_(number 1-6)_P =>  Password of the wifi network
-  - the prefix means the type of the value the field is expecting 
+## Settings list:
+#### General Settings
+  - **Joystick left MMin** -> minimum value of the left joystick x, y, z axis on the min of the range 
+  - **Joystick left MMax** -> maximum value of the left joystick x, y, z axis on the max of the range
+  - **Joystick left filer** -> inertia of the left joystick (0-1), the higher inertia the response of the joystick value will be faster.
+  - **Joystick right MMin** -> minimum value of the right joystick x, y, z axis on the min of the range
+  - **Joystick right MMax** -> maximum value of the right joystick x, y, z axis on the max of the range
+  - **Joystick right filer** -> inertia of the right joystick (0-1)
+  - **WIFI SSID** => SSID of the wifi network created by the RC in setup mode.
+  - **WIFI PASSWORD** => password of the wifi network made by the RC in setup mode
+  - **Update frequency** => frequency of sending data frame
+  - **Target IP** => IP address to which the RC will send data frame
+  - **Host Port** => port to which the RC will send data frame
+
+#### WIFI target networks
+  - **Wifi [number 1-6] : Seed** => SSID of the wifi network (where number means priority from 1 to 6)
+  - **Wifi [number 1-6] : Password** => Password of the wifi network
 
 
 
 ## Required component list
-- Components are in BOM file "Electric schematic/Pilot6Axis/jlcpcb/production_files/BOM-Pilot6Axis.csv"
 
-- From JLCB order the pcb "Electric schematic/Pilot6Axis/jlcpcb/production_files/GERBER-Pilot6Axis.zip"
-  ![PCB](images/pcb.png)
+### Component Images
 
-- Joystick 4-axis JH-D400B-M4
-  ![Joystick 4-axis JH-D400B-M4](images/joystick.png)
+  | Component | Photo | Component | Photo |
+  |-----------|-------|-----------|-------|
+  | PCB (order from JLCPCB) | <img src="images/pcb.png" alt="PCB" width="80"/> | Joystick 4-axis JH-D400B-M4 | <img src="images/joystick.png" alt="Joystick" width="80"/> |
+  | Toggle switch 6mm MTS-103 | <img src="images/toggle_switch_small.png" alt="Toggle switch" width="80"/> | Monostable switches 12mm PBS-33B | <img src="images/monostable_switches_small.png" alt="Monostable switches" width="80"/> |
+  | Li-ion battery 3.7V 4000mAh | <img src="images/li_ion_battery_small.jpg" alt="Li-ion battery" width="80"/> | LCD 1.3" 128x64 OLED SSD1306 | <img src="images/lcd_small.png" alt="LCD" width="80"/> |
+  | Antena 2.4GHz 3dBi WiFi RP-SMA | <img src="images/antena_small.png" alt="Antenna" width="80"/> | M3 6mm hex socket flat countersunk | <img src="images/m3_screws_small.png" alt="M3 screws" width="80"/> |
+  | M3 heated insert M3xL3xOD4.2 | <img src="images/m3_heated_insert_small.png" alt="M3 heated insert" width="80"/> | M3 5mm hex socket cylindrical | <img src="images/m3_screws_small_cyl.png" alt="M3 screws cylindrical" width="80"/> |
 
-- Toggle switch 6mm x1 MTS-103  
-  ![Toggle switch 6mm](images/toggle_switch_small.png)
 
-- Monostable switches 12mm x8  PBS-33B
-  ![Monostable switches 12mm](images/monostable_switches_small.png)
+### Component list 
 
-- Li-ion battery 606090 3.7V 4000mAh
-  ![Li-ion battery 3.7V](images/li_ion_battery_small.jpg)
+  | Component Name                                   | Parts Count | Description                                              |
+  |--------------------------------------------------|-------------|----------------------------------------------------------|
+  | Joystick 4-axis JH-D400B-M4                      | 2           | 3-DOF joysticks for axis control                        |
+  | Toggle switch 6mm MTS-103                        | 1           | Main toggle switch for power or mode selection           |
+  | Monostable switches 12mm PBS-33B                 | 8           | Momentary push buttons for user input                   |
+  | Li-ion battery 606090 3.7V 4000mAh               | 1           | Rechargeable battery for power supply                    |
+  | LCD 1.3" 128x64 OLED SSD1306                     | 1           | Display for status and configuration                     |
+  | Antena 2.4GHz 3dB WiFi 2.4GHz RP-SMA             | 1           | External Wi-Fi antenna for wireless communication        |
+  | M3 6mm hex socket flat countersunk screws        | 14          | Screws for assembling the enclosure                      |
+  | M3 heated insert M3xL3xOD4.2                     | 19          | Threaded inserts for secure screw mounting               |
+  | M3 5mm hex socket cylindrical screws             | 4           | Additional screws for assembly                           |
+  | PCB (order from JLCPCB)                          | 1           | Main circuit board for the controller                    |
+  | BOM Components (see BOM file)                    | -           | All other electronic components (resistors, ICs, etc.)   |
 
-- LCD 1.3" 128x64 OLED SSD1306
-  ![LCD 1.3" 128x64 OLED SSD1306](images/lcd_small.png)
-
-- Antena 2.4GHz 3dB WiFi 2.4GHz RP-SMA
-  ![Antena 2.4GHz 3dBi WiFi 2.4GHz RP-SMA](images/antena_small.png)
-
-- M3 6mm hex socket flat countersunk x 14 
-  ![M3 screws](images/m3_screws_small.png)
-
-- M3 heated insert M3xL3xOD4.2 x 19
-  ![M3 heated insert](images/m3_heated_insert_small.png)
-
-- M3 5mm hex socket cylindrical  X5 
-  ![M3 screws](images/m3_screws_small_cyl.png)
+- BOM file "Electric schematic/Pilot6Axis/jlcpcb/production_files/BOM-Pilot6Axis.csv"
+- JLCB gerber files "Electric schematic/Pilot6Axis/jlcpcb/production_files/GERBER-Pilot6Axis.zip"
 
 ## How to assembly
   You figure it out.
