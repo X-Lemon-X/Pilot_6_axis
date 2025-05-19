@@ -63,22 +63,22 @@ void Print(String string) {
 #ifdef DEBUG
   Serial.print(string);
 #endif
-  oledPrint->Print(string);
+  oledPrint->print(string);
 }
 
 void Println(String string) {
 #ifdef DEBUG
   Serial.println(string);
 #endif
-  oledPrint->Println(string);
+  oledPrint->println(string);
 }
 
 void UpdateLine(String string) {
-  oledPrint->UpdateLine(string);
+  oledPrint->update_line(string);
 }
 
 void UpdateLine(String string, int line) {
-  oledPrint->UpdateLine(string, line);
+  oledPrint->update_line(string, line);
 }
 
 #pragma endregion

@@ -57,5 +57,5 @@
   "editor.formatOnSave": true,
   "stm32-for-vscode.openOCDPath": "/usr/local/bin/openocd",
   "cmake.sourceDirectory": "/home/lemonx/it/Pilot_6_axis/pilot/.pio/libdeps/esp32doit-devkit-v1/AsyncTCP-esphome",
-  "ros.distro": "humble"
+  "ros.distro": "jazzy",
 }
