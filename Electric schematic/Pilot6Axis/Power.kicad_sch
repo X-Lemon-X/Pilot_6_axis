@@ -2047,12 +2047,6 @@
 		(uuid "7786c143-8e68-42d4-ba61-9e7b156c0ec2")
 	)
 	(junction
-		(at 200.66 72.39)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "7af37c49-640e-4311-906a-c587c6c58546")
-	)
-	(junction
 		(at 107.95 128.27)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2077,6 +2071,12 @@
 		(uuid "b3ba36da-9e4f-4a61-b6b8-e12ee8f6883a")
 	)
 	(junction
+		(at 196.85 72.39)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b78076b2-9f53-4f65-820d-bdc84bbcd91f")
+	)
+	(junction
 		(at 116.84 139.7)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2093,12 +2093,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d84177fc-f457-4873-9d02-3291098c7638")
-	)
-	(junction
-		(at 200.66 85.09)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "df024402-4ea2-46cd-acc8-dfb0715085a2")
 	)
 	(junction
 		(at 105.41 72.39)
@@ -2334,7 +2328,7 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 85.09) (xy 172.72 85.09)
+			(xy 196.85 85.09) (xy 172.72 85.09)
 		)
 		(stroke
 			(width 0)
@@ -2354,7 +2348,7 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 72.39) (xy 200.66 85.09)
+			(xy 196.85 72.39) (xy 196.85 85.09)
 		)
 		(stroke
 			(width 0)
@@ -2424,7 +2418,7 @@
 	)
 	(wire
 		(pts
-			(xy 162.56 72.39) (xy 200.66 72.39)
+			(xy 162.56 72.39) (xy 196.85 72.39)
 		)
 		(stroke
 			(width 0)
@@ -2574,16 +2568,6 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 72.39) (xy 205.74 72.39)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c0087ea6-88ea-4839-a33a-950a0cc0e5dc")
-	)
-	(wire
-		(pts
 			(xy 151.13 128.27) (xy 156.21 128.27)
 		)
 		(stroke
@@ -2614,13 +2598,13 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 93.98) (xy 200.66 95.885)
+			(xy 196.85 72.39) (xy 205.74 72.39)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "dbfa6520-8f60-48a5-98e6-4ce35218df01")
+		(uuid "da4480d5-73ed-4f9e-9099-a66d540a3ca0")
 	)
 	(wire
 		(pts
@@ -2671,16 +2655,6 @@
 			(type default)
 		)
 		(uuid "eff4a15d-2752-4eb3-9537-7319a73a41ec")
-	)
-	(wire
-		(pts
-			(xy 200.66 85.09) (xy 200.66 86.36)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f3d6549a-65d6-4651-8a41-72d2cc3d3536")
 	)
 	(wire
 		(pts
@@ -2871,72 +2845,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 200.66 95.885 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "05d837dd-b49a-40d6-bb79-0aaac1d3a956")
-		(property "Reference" "#PWR05"
-			(at 200.66 102.235 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 200.66 100.33 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 200.66 95.885 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 200.66 95.885 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 200.66 95.885 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f2c786f0-1df7-441b-a2f9-35a04707cd6a")
-		)
-		(instances
-			(project "Pilot6Axis"
-				(path "/085b8362-a5df-4186-a09b-4280628dd4a5/504d928c-edb5-470d-96cf-de0a899dce19"
-					(reference "#PWR05")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 129.54 133.35 0)
 		(unit 1)
@@ -3010,85 +2918,6 @@
 			(project "Pilot6Axis"
 				(path "/085b8362-a5df-4186-a09b-4280628dd4a5/504d928c-edb5-470d-96cf-de0a899dce19"
 					(reference "C5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:C")
-		(at 200.66 90.17 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "2248adcb-ad30-488b-909f-29cdac71c1ea")
-		(property "Reference" "C3"
-			(at 203.835 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "2.2uF"
-			(at 203.835 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
-			(at 201.6252 93.98 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 200.66 90.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 200.66 90.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C23630"
-			(at 203.835 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "35da72b2-3b45-4e43-b71c-39066069d938")
-		)
-		(pin "1"
-			(uuid "bcd42a5b-9745-4f57-8cba-8b5f46b287e7")
-		)
-		(instances
-			(project "Pilot6Axis"
-				(path "/085b8362-a5df-4186-a09b-4280628dd4a5/504d928c-edb5-470d-96cf-de0a899dce19"
-					(reference "C3")
 					(unit 1)
 				)
 			)
