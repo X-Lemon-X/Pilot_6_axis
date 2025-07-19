@@ -1,0 +1,10 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "parts")(type "KiCad")(uri "${KIPRJMOD}/parts/TS-1088R-02026.kicad_sym")(options "")(descr ""))
+  (lib (name "BQ25792RQMR")(type "KiCad")(uri "${KIPRJMOD}/parts/BQ25792RQMR.kicad_sym")(options "")(descr ""))
+  (lib (name "TPS25750DRJKR")(type "KiCad")(uri "${KIPRJMOD}/parts/TPS25750DRJKR.kicad_sym")(options "")(descr ""))
+  (lib (name "TPS25751SRSMR")(type "KiCad")(uri "${KIPRJMOD}/parts/TPS25751SRSMR.kicad_sym")(options "")(descr ""))
+  (lib (name "ts-1212f")(type "KiCad")(uri "${KIPRJMOD}/parts/ts-1212f.kicad_sym")(options "")(descr ""))
+  (lib (name "tps3422")(type "KiCad")(uri "${KIPRJMOD}/parts/TPS3422EGDRYR.kicad_sym")(options "")(descr ""))
+  (lib (name "SN74LVC1G74RSE2")(type "KiCad")(uri "${KIPRJMOD}/parts/SN74LVC1G74RSE2.kicad_sym")(options "")(descr ""))
+)

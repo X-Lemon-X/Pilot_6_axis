@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "parts")(type "KiCad")(uri "${KIPRJMOD}/parts")(options "")(descr ""))
+  (lib (name "ts-1212f")(type "KiCad")(uri "${KIPRJMOD}/parts/ts-1212f.pretty")(options "")(descr ""))
+)
